@@ -1,6 +1,5 @@
 import requests
 import json
-import time
 
 LIMIT = 1000
 
@@ -28,7 +27,7 @@ class exchanges(object):
 
         first_from = 208000000
         #first_from = 208100511
-        first_till = first_from + 1000
+        first_till = first_from + LIMIT
         limit = LIMIT
         by = 'id'
 
