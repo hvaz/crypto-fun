@@ -6,9 +6,29 @@ def get_info_binance():
         "every_transaction_fee": True, \
         "api_endpoint": "https://api.binance.com", \
         "data_ascending": True, \
-        "symbols": ["ETHBTC", "NANOBTC"], \
+        "symbols": ["ETHBTC"], \
         "candles_endpoint": "/api/v1/klines", \
-        "candles_intervals": ['1m', '3m', '5m', '15m', '30m', '1h', '2h', '4h', '6h', '8h', '12h', '1d', '3d', '1w','1M']
+        "candles_intervals": {'minute': {1: '1m', 3: '3m', 5: '5m', 15: '15m', 30: '30m'}, \
+                              'hour': {1: '1h', 2: '2h', 4: '4h', 6: '6h', 8: '8h', 12: '12h'}, \
+                              'day': {1: '1d', 3: '3d'}, 'week': {1: '1w'}, 'month': {1: '1M'} \
+                             }
     }
 
     return info_binance
+
+def get_info_hitbtc():
+
+    info_hitbtc =  { \
+        "name": "hitbtc", \
+        "percentage_fee": 0.1, \
+        "every_transaction_fee": True, \
+        "api_endpoint": "https://api.hitbtc.com/api/2", \
+        "data_ascending": True, \
+        "symbols": ["ETHBTC"], \
+        "candles_endpoint": "/public/candles", \
+        "candles_intervals": {'minute': {1: 'M1', 3: 'M3', 5: 'M5', 15: 'M15', 30: 'M30'}, \
+                              'hour': {1: 'H1', 4: 'H4'}, 'day': {1: 'D1', 7: 'D7'}, 'month': {1: '1M'} \
+                             }
+    }
+
+    return info_hitbtc
