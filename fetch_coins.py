@@ -22,16 +22,7 @@ class exchange(object):
         trades_list = json.loads(r.content)
         return trades_list[0]['id']
 
-    def get_ema(factor, unit, at):
-        """
-        factor: size of EMA, positive integer
-        unit: s, m, h, d (seconds, minutes, hours, days)
-        at: timestamp indicating which EMA to calculate
-        """
 
-
-        pass
-        
 
     def get_trades(self, symbol):
 
