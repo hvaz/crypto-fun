@@ -48,7 +48,7 @@ class Candles(object):
 
         for i in range(max(start, 0), at + 1):
 
-            close = candlelist[i]['close']
+            close = candlelist[i]['close_price']
             current_ema = close * factor + current_ema * (1 - factor)
 
         return current_ema
@@ -62,7 +62,7 @@ class Candles(object):
 
         for candle in candlelist:
 
-            close = float(candlelist['close'])
+            close = float(candlelist['close_price'])
             current_ema = close * factor + current_ema * (1 - factor)
             ema_list.append(current_ema)
 
