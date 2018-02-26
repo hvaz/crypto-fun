@@ -1,24 +1,44 @@
 import requests
 import json
 
-import symbols
+import markets
+import info_exchanges
 
 LIMIT = 1000
 
 class exchange(object):
 
-    def __init__(self, name, api_endpoint, symbols=None):
+    def __init__(self, info):
 
-        self._name = name
-        self._api = api_endpoint
-        self._symbols = []
+        self.name = info['name']
+        self.api = info['api_endpoint']
+        self.symbols = info['symbols']
+        self.candles_endpoint = info['candles_endpoint']
+        self.candles_intervals = info['candles_intervals']
+        self.data_ascending = info['data_ascending']
 
         if (symbol != None):
             for s_name in symbols:
                 new_symbol = symbol(s_name)
                 self._symbols.append(new_symbol)
 
+    def get_candles(self, symbol_name, interval):
 
+        if (symbol_name not in self.symbols or 
+            interval not in self.candles_intervals):
+
+            raise "Invalid parameters for get_candles"
+            return
+
+        mkt = market(symbol_name)
+        return mkt.get_candles(interval)
+
+        
+
+binance = exchange(info_binance)
+
+
+    """
     def _most_recent_trade_id(self, symbol):
 
         url = self._trades_url
@@ -77,3 +97,4 @@ class exchange(object):
 
 hitbtc = exchange('hitbtc', "https://api.hitbtc.com/api/2/public/trades/{}")
 hitbtc.get_trades('SKINBTC')
+"""

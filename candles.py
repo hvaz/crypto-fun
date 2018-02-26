@@ -66,7 +66,7 @@ class candles(object):
 
 
 
-    def test_ema_model(self, start, end, short_factor, long_factor, fee, treshold):
+    def test_ema_model(self, start, end, short_factor, long_factor, fee, threshold):
 
         candle_list = self.data
         short_ema_list = self.get_ema_list(short_factor)
@@ -79,18 +79,18 @@ class candles(object):
         
         for i in range(start, end):
 
-            if (short_emma_list[i] > long_emma_list[i] + treshold) and side == 'c1':
+            if (short_emma_list[i] > long_emma_list[i] + threshold) and side == 'c1':
                 total_c1 = 0
                 total_c2 = (1-fee)*total_c1*candle_list[i]['close']
                 side = 'c2'
 
-            if (short_emma_list[i] < long_emma_list[i] - treshold) and side == 'c2'):
-                total_c1 = (1-fee)*total_c2/candle_list[i]['close']
+            if (short_emma_list[i] < long_emma_list[i] - threshold) and side == 'c2'):
+                total_c1 = (1 - fee) * total_c2 / candle_list[i]['close']
                 total_c2 = 0
                 side = 'c1'
         
         if side == 'c2':
-            total_c1 = (1-fee)*total_c2/candle_list[end-1]['close']
+            total_c1 = (1 - fee) * total_c2 / candle_list[end - 1]['close']
             total_c2 = 0
 
         profits = total_c1 - 1.0

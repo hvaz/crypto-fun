@@ -1,6 +1,8 @@
 info_binance = 
 {
     "name": "binance",
+    "percentage_fee": 0.1,
+    "every_transaction_fee": True,
     "api_endpoint": "https://api.binance.com",
     "data_ascending": True,
     "symbols": ["ETHBTC", "NANOBTC"],
