@@ -1,44 +1,65 @@
 import requests
 import json
 
-import markets
+from markets import Market
+from candles import Candles
 import info_exchanges
 
-LIMIT = 1000
 
-class exchange(object):
+class Exchange(object):
 
     def __init__(self, info):
 
         self.name = info['name']
-        self.api = info['api_endpoint']
-        self.symbols = info['symbols']
+        self.api_endpoint = info['api_endpoint']
+        self.percentage_fee = info['percentage_fee']
+        self.every_transaction_fee = info['every_transaction_fee']
+        self.markets = {}
         self.candles_endpoint = info['candles_endpoint']
         self.candles_intervals = info['candles_intervals']
         self.data_ascending = info['data_ascending']
 
-        if (symbol != None):
-            for s_name in symbols:
-                new_symbol = symbol(s_name)
-                self._symbols.append(new_symbol)
+        if (len(info['symbols']) > 0):
+            for s_name in info['symbols']:
+                self.markets[s_name] = Market(s_name, self.percentage_fee)
 
-    def get_candles(self, symbol_name, interval):
+    
+    def __get_candles_data(self, mkt_name, interval):
 
-        if (symbol_name not in self.symbols or 
+        filename = 'exchange=' + self.name + '_mkt=' + mkt_name + '_data=candles_interval=' + interval + '.txt'
+        with open(filename, 'a') as f:
+            
+            with requests.Session() as session:
+                
+                payload = {'symbol': mkt_name, 'interval': interval}
+                url = self.api_endpoint + self.candles_endpoint
+                r = session.get(url, params=payload)
+                print r.content
+                if (r.status_code != 200):
+                    raise r.raise_for_status()
+
+                f.write(r.content)
+
+
+    def set_candles(self, mkt_name, interval):
+
+        if (mkt_name not in self.markets.keys() or 
             interval not in self.candles_intervals):
 
             raise "Invalid parameters for get_candles"
             return
-
-        mkt = market(symbol_name)
-        return mkt.get_candles(interval)
+        
+        mkt = self.markets[mkt_name]
+        candles_data = self.__get_candles_data(mkt_name, interval)
+        mkt.candles[interval] = Candles(interval, candles_data)
 
         
+info_binance = info_exchanges.get_info_binance()
+binance = Exchange(info_binance)
+binance.set_candles('ETHBTC', '1m')
 
-binance = exchange(info_binance)
 
-
-    """
+"""
     def _most_recent_trade_id(self, symbol):
 
         url = self._trades_url

@@ -4,19 +4,11 @@ intervals = ['1m', '3m', '5m', '15m', '30m', \
              '1w',
              '1M']
 
-class market(object):
+class Market(object):
 
-    def __init__(self, name):
+    def __init__(self, name, percentage_fee):
 
         self.name = name
+        self.fee = percentage_fee
         self.candles = {i:None for i in intervals}
-
-    def get_candles(self, interval):
-
-        if (interval not in intervals):
-
-            raise "Invalid unit for candles!"
-            return
-
-        self.candles[interval] = candles(interval)
 

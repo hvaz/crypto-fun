@@ -25,7 +25,7 @@ Candles consist of a list of candles obeying to the following format:
 OBS: Data is returned in ascending order. Oldest first, newest last.
 """
 
-class candles(object):
+class Candles(object):
 
     def __init__(self, interval, data):
 
@@ -50,6 +50,7 @@ class candles(object):
 
         return current_ema
 
+
     def get_ema_list(self, factor):
 
         candlelist = self.data
@@ -63,7 +64,6 @@ class candles(object):
             ema_list.append(current_ema)
 
         return ema_list
-
 
 
     def test_ema_model(self, start, end, short_factor, long_factor, fee, threshold):
@@ -84,7 +84,7 @@ class candles(object):
                 total_c2 = (1-fee)*total_c1*candle_list[i]['close']
                 side = 'c2'
 
-            if (short_emma_list[i] < long_emma_list[i] - threshold) and side == 'c2'):
+            if (short_emma_list[i] < (long_emma_list[i] - threshold) and side == 'c2'):
                 total_c1 = (1 - fee) * total_c2 / candle_list[i]['close']
                 total_c2 = 0
                 side = 'c1'
