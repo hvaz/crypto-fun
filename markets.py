@@ -13,18 +13,6 @@ class Market(object):
         self.candles = {i:None for i in intervals}
 
     
-    def get_candles(self, interval):
-
-        if (interval not in intervals):
-
-            raise "Invalid unit for candles!"
-            return
-
-        self.candles[interval] = candles(interval)
-
-
-
-
     def test_ema_model(candles_object, start, end, short_factor, long_factor, threshold):
 
         fee = self.fee
