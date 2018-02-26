@@ -39,12 +39,12 @@ class Market(object):
 
         for i in range(start, end):
             close = float(candle_list[i]['close'])
-            if (short_ema_list[i] > (long_ema_list[i]*(1+treshold)) and side == 'c1'):
-                total_c2 = (1-fee)*total_c1/close
+            if (short_ema_list[i] > (long_ema_list[i] * (1 + threshold)) and side == 'c1'):
+                total_c2 = (1 - fee) * total_c1 / close
                 total_c1 = 0
                 side = 'c2'
 
-            if (short_ema_list[i] < (long_ema_list[i]*(1-treshold)) and side == 'c2'):
+            if (short_ema_list[i] < (long_ema_list[i] * (1 - threshold)) and side == 'c2'):
                 total_c1 = (1 - fee) * total_c2 * close
                 total_c2 = 0
                 side = 'c1'
