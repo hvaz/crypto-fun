@@ -41,12 +41,15 @@ class Candles(object):
 
         period = 1.0 / factor
         start = int(at - period)
-        current_ema = 0
+        current_ema = -1
 
         for i in range(max(start, 0), at + 1):
 
             close = candlelist[i]['close']
-            current_ema = close * factor + current_ema * (1 - factor)
+            if current_ema = -1:
+                current_ema = close
+            else:
+                current_ema = close * factor + current_ema * (1 - factor)
 
         return current_ema
 
@@ -55,12 +58,16 @@ class Candles(object):
 
         candlelist = self.data
         ema_list = []
-        current_ema = 0
+        current_ema = -1
 
         for candle in candlelist:
 
-            close = float(candlelist['close'])
-            current_ema = close * factor + current_ema * (1 - factor)
+            close = float(candle['close'])
+            if current_ema == -1:
+                current_ema = close
+            else:
+                current_ema = close * factor + current_ema * (1 - factor)
             ema_list.append(current_ema)
 
         return ema_list
+
