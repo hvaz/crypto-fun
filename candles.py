@@ -27,10 +27,9 @@ OBS: Data is returned in ascending order. Oldest first, newest last.
 
 class candles(object):
 
-    def __init__(self, factor, unit, data):
+    def __init__(self, interval, data):
 
-        self.factor = factor
-        self.unit = unit
+        self.interval = interval
         self.data = data
 
 
