@@ -1,14 +1,23 @@
 import requests
 import json
 
+import symbols
+
 LIMIT = 1000
 
 class exchange(object):
 
-    def __init__(self, name, trades_url):
+    def __init__(self, name, api_endpoint, symbols=None):
 
         self._name = name
-        self._trades_url = trades_url
+        self._api = api_endpoint
+        self._symbols = []
+
+        if (symbol != None):
+            for s_name in symbols:
+                new_symbol = symbol(s_name)
+                self._symbols.append(new_symbol)
+
 
     def _most_recent_trade_id(self, symbol):
 
@@ -21,8 +30,6 @@ class exchange(object):
 
         trades_list = json.loads(r.content)
         return trades_list[0]['id']
-
-
 
     def get_trades(self, symbol):
 
