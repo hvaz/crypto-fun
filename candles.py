@@ -3,23 +3,26 @@ Candles consist of a list of candles obeying to the following format:
 
 [
   {
-    "timestamp": "2017-10-20T20:00:00.000Z",
-    "open": "0.050459",
-    "close": "0.050087",
-    "min": "0.050000",
-    "max": "0.050511",
-    "volume": "1326.628",
-    "volumeQuote": "66.555987736"
+    "open_tstamp": int,
+    "close_tstamp": int,
+    "open_price": float,
+    "close_price": float,
+    "min_price": float,
+    "max_price": float,
+    "volume": float,
+    "volumeQuote": float
   },
   {
-    "timestamp": "2017-10-20T20:30:00.000Z",
-    "open": "0.050108",
-    "close": "0.050139",
-    "min": "0.050068",
-    "max": "0.050223",
-    "volume": "87.515",
-    "volumeQuote": "4.386062831"
-  }
+    "open_tstamp": int,
+    "close_tstamp": int,
+    "open_price": float,
+    "close_price": float,
+    "min_price": float,
+    "max_price": float,
+    "volume": float,
+    "volumeQuote": float
+  }, 
+  ...
 ]
 
 OBS: Data is returned in ascending order. Oldest first, newest last.
@@ -41,15 +44,12 @@ class Candles(object):
 
         period = 1.0 / factor
         start = int(at - period)
-        current_ema = -1
+        current_ema = 0
 
         for i in range(max(start, 0), at + 1):
 
             close = candlelist[i]['close']
-            if current_ema = -1:
-                current_ema = close
-            else:
-                current_ema = close * factor + current_ema * (1 - factor)
+            current_ema = close * factor + current_ema * (1 - factor)
 
         return current_ema
 
@@ -58,16 +58,12 @@ class Candles(object):
 
         candlelist = self.data
         ema_list = []
-        current_ema = -1
+        current_ema = 0
 
         for candle in candlelist:
 
-            close = float(candle['close'])
-            if current_ema == -1:
-                current_ema = close
-            else:
-                current_ema = close * factor + current_ema * (1 - factor)
+            close = float(candlelist['close'])
+            current_ema = close * factor + current_ema * (1 - factor)
             ema_list.append(current_ema)
 
         return ema_list
-
