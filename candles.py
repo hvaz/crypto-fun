@@ -32,7 +32,7 @@ class candles(object):
         self.interval = interval
         self.data = data
 
-
+    # assumes data is in ascending time
     def get_ema(self, factor, at):
 
         candlelist = self.data
@@ -50,6 +50,7 @@ class candles(object):
 
         return current_ema
 
+    # assumes data is in ascending time
     def get_ema_list(self, factor):
 
         candlelist = self.data
