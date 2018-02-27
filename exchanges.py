@@ -85,7 +85,6 @@ class Exchange(object):
         return {'url': url, 'payload': payload}
 
 
-
     def __get_candles_data(self, mkt_name, interval, target):
 
         filename = 'exchange=' + self.name + '_mkt=' + mkt_name + '_data=candles_interval=' + interval + '.txt'
