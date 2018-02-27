@@ -23,7 +23,7 @@ class Exchange(object):
 
         if (len(info['symbols']) > 0):
             for s_name in info['symbols']:
-                self.markets[s_name] = Market(s_name, self.percentage_fee)
+                self.markets[s_name] = Market(s_name, self.percentage_fee, self.candles_intervals)
 
 
     def __format_candles(self, candles):

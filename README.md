@@ -6,12 +6,12 @@
 pip install requests
 ```
 
-## Set Up
-
-Adjust ```first_from``` variable according to first id from which you want to scrape all info.
-
 ## Running
 
+To get your candles, run
+
 ```
-python fetch_coins.py
+python exchanges.py
 ```
+
+And then use the test function (more on this later, including improved usability)

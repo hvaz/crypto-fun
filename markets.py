@@ -1,10 +1,15 @@
 class Market(object):
 
-    def __init__(self, name, percentage_fee):
+    def __init__(self, name, percentage_fee, intervals):
 
         self.name = name
         self.fee = percentage_fee
-        self.candles = {i: None for i in intervals}
+        self.candles = {}
+        
+        for unit in intervals.keys():
+            unit_dict = intervals[unit]
+            for size in unit_dict.keys():
+                self.candles[unit_dict[size]] = None
 
     
     def test_ema_model(candles_object, start, end, short_factor, long_factor, threshold):
