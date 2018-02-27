@@ -4,6 +4,7 @@
 
 ```
 pip install -r requirements.txt
+echo "source `which activate.sh`" >> ~/.bashrc
 ```
 
 ## Running
