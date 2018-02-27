@@ -13,8 +13,9 @@ class Market(object):
 
     
     def test_ema_model(candles_object, start, end, short_factor, long_factor, threshold):
-
-        fee = self.fee
+        
+        ## adjust fee to be between 0 and 1 since it is given as percentage
+        fee = self.fee / 100
         candle_list = candles_object.data
         short_ema_list = candles_object.get_ema_list(short_factor)
         long_ema_list = candles_object.get_ema_list(long_factor)
