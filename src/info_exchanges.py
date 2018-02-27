@@ -1,5 +1,4 @@
 def get_info_binance():
-
     info_binance =  { \
         "name": "binance", \
         "percentage_fee": 0.1, \
@@ -17,7 +16,6 @@ def get_info_binance():
     return info_binance
 
 def get_info_hitbtc():
-
     info_hitbtc =  { \
         "name": "hitbtc", \
         "percentage_fee": 0.1, \
