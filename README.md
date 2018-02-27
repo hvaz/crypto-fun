@@ -3,8 +3,7 @@
 ## Dependencies
 
 ```
-echo "source `which activate.sh`" >> ~/.bashrc
-pip install -r requirements.txt
+pip install requests
 ```
 
 ## Running
