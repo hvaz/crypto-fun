@@ -11,7 +11,7 @@ pip install requests
 To get your candles, run
 
 ```
-python exchanges.py
+python ./src/exchanges.py
 ```
 
 And then use the test function (more on this later, including improved usability)
