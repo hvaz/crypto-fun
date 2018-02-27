@@ -29,40 +29,17 @@ OBS: Data is returned in ascending order. Oldest first, newest last.
 """
 
 class Candles(object):
-
     def __init__(self, interval, data):
-
         self.interval = interval
-        self.data = data
-
-    # assumes data is in ascending time
-    def get_ema(self, factor, at):
-
-        candlelist = self.data
-        if at >= len(candlelist) or at < 0:
-            return -1
-
-        period = 1.0 / factor
-        start = int(at - period)
-        current_ema = 0
-
-        for i in range(max(start, 0), at + 1):
-
-            close = candlelist[i]['close_price']
-            current_ema = close * factor + current_ema * (1 - factor)
-
-        return current_ema
+        self.candle_list = data
 
     # assumes data is in ascending time
     def get_ema_list(self, factor):
-
-        candlelist = self.data
         ema_list = []
         current_ema = 0
 
-        for candle in candlelist:
-
-            close = float(candlelist['close_price'])
+        for _ in self.candle_list:
+            close = float(self.candle_list['close_price'])
             current_ema = close * factor + current_ema * (1 - factor)
             ema_list.append(current_ema)
 
