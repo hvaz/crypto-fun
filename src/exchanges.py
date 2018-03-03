@@ -4,7 +4,6 @@ from datetime import datetime
 
 from markets import Market
 from candles import Candles
-import info_exchanges
 
 NUM_CANDLES = 1000
 
@@ -121,12 +120,3 @@ class Exchange(object):
         mkt = self.markets[mkt_name]
         candles_data = self._get_candles_data(mkt_name, interval, NUM_CANDLES)
         mkt.candles[interval] = Candles(interval, candles_data)
-
-        
-info_binance = info_exchanges.get_info_binance()
-binance = Exchange(info_binance)
-binance.update_candles('ETHBTC', 1, 'minute')
-
-info_hitbtc = info_exchanges.get_info_hitbtc()
-hitbtc = Exchange(info_hitbtc)
-hitbtc.update_candles('ETHBTC', 1, 'minute')
