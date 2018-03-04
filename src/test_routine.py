@@ -63,7 +63,7 @@ for x in exchange_list:
             mkt_strategy_profit = mkt.test_ema_model(cur_candles, start, end, 0.1, 0.7, 0.0001)
 
         elif (strategy == "stat"):
-            mkt_strategy_profit = mkt.test_stat_model(cur_candles, start, end, -2, 2, updating=False)
+            mkt_strategy_profit = mkt.test_stat_model(cur_candles, start, end, -2, 2, updating=True)
         
         exchange_profits[m] = {}
         mkt_profits = exchange_profits[m]
@@ -73,6 +73,7 @@ for x in exchange_list:
         hold_profit = mkt.test_hold_model(cur_candles, start, end, 0.2)
         mkt_profits['hold'] = hold_profit
 
+	mkt.study_stats(cur_candles, start, end, updating=True)
 
 print "\n\n\n"
 
