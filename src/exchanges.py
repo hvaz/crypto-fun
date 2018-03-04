@@ -5,7 +5,7 @@ from datetime import datetime
 from markets import Market
 from candles import Candles
 
-NUM_CANDLES = 1000
+NUM_CANDLES = 500
 
 class Exchange(object):
     def __init__(self, info):
@@ -95,23 +95,25 @@ class Exchange(object):
                         raise r.raise_for_status()
 
                     f.write(str(formatted_candles))
+                
+        return formatted_candles
 
 
-    def __format_interval(self, size, unit):
+    def format_interval(self, size, unit):
         if (unit not in self.candles_intervals.keys()):
-            raise 'Invalid unit used for candles in this exchange'
+            raise Exception('Invalid unit used for candles in this exchange')
         
         possible_intervals = self.candles_intervals[unit]
         possible_sizes = possible_intervals.keys()
         if (size not in possible_sizes):
-            raise 'Invalid size/unit used for candles in this exchange'
+            raise Exception('Invalid size/unit used for candles in this exchange')
 
         return possible_intervals[size]
 
 
     def update_candles(self, mkt_name, size, unit):
         
-        interval = self.__format_interval(size, unit)
+        interval = self.format_interval(size, unit)
         print 'interval = {}'.format(interval)
 
         if (mkt_name not in self.markets.keys()):

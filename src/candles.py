@@ -33,13 +33,14 @@ class Candles(object):
         self.interval = interval
         self.candle_list = data
 
+
     # assumes data is in ascending time
     def get_ema_list(self, factor):
         ema_list = []
         current_ema = 0
 
-        for _ in self.candle_list:
-            close = float(self.candle_list['close_price'])
+        for candle in self.candle_list:
+            close = float(candle['close_price'])
             current_ema = close * factor + current_ema * (1 - factor)
             ema_list.append(current_ema)
 
