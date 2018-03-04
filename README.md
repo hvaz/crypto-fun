@@ -40,7 +40,8 @@ optional arguments:
                         chronological extension: Check infos.py file for
                         options. Default value is minute
   --strategy STRATEGY   Strategy to be tested. Options: ['ema', 'stat']
-  --start START         Index of candle from which to start executing strategy
+  --start START         Index of candle from which to start executing strategy.
+												Default value is 10
   --end END             Index of candle in which to stop executing strategy.
                         Default value is 950
   --calib_proportion CALIB_PROPORTION

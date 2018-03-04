@@ -14,7 +14,7 @@ parser.add_argument("--candles_m_unit", metavar="CANDLES_M_UNIT", type=str, narg
 
 parser.add_argument("--strategy", metavar="STRATEGY", type=str, nargs=1, required=True, help="Strategy to be tested. Options: {}".format(strategies))
 
-parser.add_argument("--start", metavar="START", type=int, nargs=1, default=10, help="Index of candle from which to start executing strategy")
+parser.add_argument("--start", metavar="START", type=int, nargs=1, default=10, help="Index of candle from which to start executing strategy. Default value is 10")
 
 parser.add_argument("--end", metavar="END", type=int, nargs=1, default=950, help="Index of candle in which to stop executing strategy. Default value is 950")
 
