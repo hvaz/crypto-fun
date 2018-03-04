@@ -2,3 +2,6 @@
 *.pyc
 *.py~
 *.DS_Store
+
+!requirements.txt
+*.txt

@@ -6,7 +6,7 @@ info_exchanges = { \
         "every_transaction_fee": True, \
         "api_endpoint": "https://api.binance.com", \
         "data_ascending": True, \
-        "symbols": ["ETHBTC", "TRXBTC"], \
+        "symbols": ["ETHBTC", "TRXBTC", "NANOBTC"], \
         "candles_endpoint": "/api/v1/klines", \
         "candles_intervals": {'minute': {1: '1m', 3: '3m', 5: '5m', 15: '15m', 30: '30m'}, \
                               'hour': {1: '1h', 2: '2h', 4: '4h', 6: '6h', 8: '8h', 12: '12h'}, \

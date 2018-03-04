@@ -5,7 +5,7 @@ from datetime import datetime
 from markets import Market
 from candles import Candles
 
-NUM_CANDLES = 500
+NUM_CANDLES = 1000
 
 class Exchange(object):
     def __init__(self, info):
@@ -58,7 +58,7 @@ class Exchange(object):
         return formatted_candles
 
 
-    def _get_candles_url_and_payload(self, mkt_name, interval, limit=500):
+    def _get_candles_url_and_payload(self, mkt_name, interval, limit=1000):
         if (self.name == 'binance'):
             url = self.api_endpoint + self.candles_endpoint
             payload = {'symbol': mkt_name, 'interval': interval, 'limit': limit}

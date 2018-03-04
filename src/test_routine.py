@@ -14,6 +14,10 @@ parser.add_argument("--candles_m_unit", metavar="CANDLES_M_UNIT", type=str, narg
 
 parser.add_argument("--strategy", metavar="STRATEGY", type=str, nargs=1, help="Strategy to be tested. Options: {}".format(strategies))
 
+parser.add_argument("--start", metavar="START", type=int, nargs=1, help="Index of candle from which to start executing strategy")
+
+parser.add_argument("--end", metavar="END", type=int, nargs=1, help="Index of candle in which to stop executing strategy") 
+
 args = parser.parse_args()
 
 exchange_list = [x.lower() for x in args.exchanges]
@@ -21,6 +25,8 @@ markets_list = [m.upper() for m in args.markets]
 m_size = args.candles_m_size[0]
 m_unit = args.candles_m_unit[0]
 strategy = args.strategy[0]
+start = args.start[0]
+end = args.end[0]
 
 ## check if arguments make sense
 if args.strategy[0] not in strategies:
@@ -37,7 +43,7 @@ for x in exchange_list:
 
 
 profits = {}
-## instantiate exchanges and update candles
+## instantiate exchanges, update candles, and run strategy
 exchange_objs = []
 for x in exchange_list:
     exchange_info = info_exchanges[x]
@@ -51,23 +57,35 @@ for x in exchange_list:
         interval = new_exchange.format_interval(m_size, m_unit)
         mkt = new_exchange.markets[m]
         
-        mkt_profit = 0
+        mkt_strategy_profit = 0
         cur_candles = mkt.candles[interval]
         if (strategy == "ema"):
-            mkt_profit = mkt.test_ema_model(cur_candles, 10, 400, 0.1, 0.7, 0.0001)
+            mkt_strategy_profit = mkt.test_ema_model(cur_candles, start, end, 0.1, 0.7, 0.0001)
 
         elif (strategy == "stat"):
-            mkt_profit = mkt.test_stat_model(cur_candles, 10, 400, -2, 1)
-    
-        exchange_profits[m] = mkt_profit
+            mkt_strategy_profit = mkt.test_stat_model(cur_candles, start, end, -2, 2, updating=False)
+        
+        exchange_profits[m] = {}
+        mkt_profits = exchange_profits[m]
+        mkt_profits[strategy] = mkt_strategy_profit
+        
+        ## run benckmark strategy (holding)
+        hold_profit = mkt.test_hold_model(cur_candles, start, end, 0.2)
+        mkt_profits['hold'] = hold_profit
+
+
+print "\n\n\n"
 
 ## print results
-print "Results for strategy {}\n\n".format(strategy)
-
-for x, mkts in profits.items():
+for x, mkts_profits in profits.items():
     print "---> Exchange: {}\n".format(x)
 
-    for mkt, profit in mkts.items():
-        print "---------> Market: {} ........... Profit: {}".format(mkt, profit)
+    for mkt, strat_profits in mkts_profits.items():
+        for strat_name, profit in strat_profits.items():
+
+            print "---------> Market: {} ........... Strategy: {} ............ Profit: {}".format(mkt, strat_name, profit)
+
+
+        print "\n"
 
     print "\n\n\n"
