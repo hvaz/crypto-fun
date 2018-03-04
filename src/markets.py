@@ -1,3 +1,5 @@
+import random
+
 class Market(object):
 
     def __init__(self, name, percentage_fee, intervals):
@@ -116,3 +118,23 @@ class Market(object):
 
         profits = total_c1 - 1.0
         return profits
+
+
+    def study_stats(self, candle_object, start, end, updating=False):
+        
+        lim = 1000
+
+        mmax = -2
+        
+        print("Hold profit:", self.test_hold_model(candle_object, start, end, 0.2))
+
+        for i in range(lim):
+            buy = -6*random.random()
+            sell = 6*random.random()
+            profit = self.test_stat_model(candle_object, start, end, buy, sell, True)
+            if profit > mmax:
+                bestbuy = buy
+                bestsell = sell
+                mmax = profit
+                print(buy, sell, profit)
+        
