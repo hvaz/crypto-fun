@@ -73,7 +73,7 @@ class Market(object):
         total_c2 = 0
         side = 'c1'
 
-        for i in range(start, end-1):
+        for i in range(end_calib, end-1):
             close = float(c_list[i+1]['close_price'])
             if (close < (avg + stdev * buy_th) and side == 'c1'):
                 total_c2 = (1 - fee) * total_c1 / close
@@ -88,6 +88,27 @@ class Market(object):
         if side == 'c2':
             total_c1 = (1 - fee) * total_c2 * close
             total_c2 = 0
+
+        profits = total_c1 - 1.0
+        return profits
+
+
+    def test_hold_model(self, candle_object, start, end, calib_proportion):
+        
+        candle_list = candle_object.data
+        fee = self.fee / 100
+        total_c1 = 1.0
+        total_c2 = 0.0
+
+        end_calib = int(start + calib_proportion * (end-start))
+        
+        close = float(candle_list[end_calib]['close_price'])
+        total_c2 = (1 - fee) * total_c1 / close
+        total_c1 = 0
+
+        close = float(cabdke_list[end]['close_price'])
+        total_c1 = (1 - fee) * total_c2 * close
+        total_c2 = 0
 
         profits = total_c1 - 1.0
         return profits
