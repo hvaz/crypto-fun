@@ -42,12 +42,13 @@ strategy = args.strategy[0]
 start = args.start[0] if type(args.start) == list else args.start
 end = args.end[0] if type(args.end) == list else args.end
 calib_proportion = args.calib_proportion[0]
-updating_stat = args.updating_stat
-short_factor = args.ema_short
-long_factor = args.ema_long
-ema_threshold = args.ema_threshold
-stat_buy_th = args.stat_buy_th
-stat_sell_th = args.stat_sell_th
+updating_stat = args.updating_stat[0] if type(args.updating_stat) == list else args.updating_stat
+short_factor = args.ema_short[0] if type(args.ema_short) == list else args.ema_short
+long_factor = args.ema_long[0] if type(args.ema_long) == list else args.ema_long
+ema_threshold = args.ema_threshold[0] if type(args.ema_threshold) == list else args.ema_threshold
+stat_buy_th = args.stat_buy_th[0] if type(args.stat_buy_th) == list else args.stat_buy_th
+stat_sell_th = args.stat_sell_th[0] if type(args.stat_sell_th) == list else args.stat_sell_th
+
 
 ## check if arguments make sense
 if args.strategy[0] not in strategies:
@@ -60,7 +61,7 @@ for x in exchange_list:
     exchange = info_exchanges[x]
     for m in markets_list:
         if m not in exchange["symbols"]:
-            raise Exception("{} market not yet supported by exchange {} in our system. Please try again.".format(x, m))
+            raise Exception("{} market not yet supported by exchange {} in our system. Please try again.".format(m, x))
 
 
 profits = {}
@@ -92,9 +93,9 @@ for x in exchange_list:
         
         ## run benckmark strategy (holding)
         hold_profit = mkt.test_hold_model(cur_candles, start, end, calib_proportion)
-        mkt_profits['hold'] = hold_profit
+        mkt_profits["hold"] = hold_profit
 
-	mkt.study_stats(cur_candles, start, end, updating=True)
+	mkt.study_stats(cur_candles, start, end, updating=updating_stat)
 
 print "Sample size: {} candles\n\n".format(NUM_CANDLES)
 
@@ -105,7 +106,7 @@ for x, mkts_profits in profits.items():
     for mkt, strat_profits in mkts_profits.items():
         for strat_name, profit in strat_profits.items():
 
-            if (strategy == 'stat'):
+            if (strat_name == "stat"):
 
                 if (updating_stat):
                     print "---------> Market: {} ........... Strategy: stat updating=True ............ Profit: {}".format(mkt, profit)

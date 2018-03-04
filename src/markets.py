@@ -74,8 +74,9 @@ class Market(object):
         total_c2 = 0
         side = 'c1'
 
-        for i in range(end_calib, end-1):
-            close = float(c_list[i+1]['close_price'])
+        for i in range(end_calib, end - 1):
+            close = float(c_list[i + 1]['close_price'])
+
             if (close < (avg + stdev * buy_th) and side == 'c1'):
                 total_c2 = (1 - fee) * total_c1 / close
                 total_c1 = 0
