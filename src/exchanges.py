@@ -39,7 +39,9 @@ class Exchange(object):
         formatted_candles = []
         for c in candles:
             new_candle = {}
+            
             for param, index in equivalence.items():
+
                 if (index == None):
                     new_candle[param] = None
                 else:
@@ -81,7 +83,10 @@ class Exchange(object):
                 while (candles_count < target):
                     request_info = self._get_candles_url_and_payload(mkt_name, interval)
                     url, payload = request_info['url'], request_info['payload']
+
                     r = session.get(url, params=payload)
+                    if (r.status_code != 200):
+                        raise Exception(r.content)
                     
                     json_content = json.loads(r.content)
                     formatted_candles = self._format_candles(json_content)
@@ -89,12 +94,11 @@ class Exchange(object):
                         return
                     
                     candles_count += len(formatted_candles)
-                    print "Number of candles: {}".format(len(formatted_candles))
 
                     if (r.status_code != 200):
                         raise r.raise_for_status()
 
-                    f.write(str(formatted_candles))
+                    #f.write(str(formatted_candles))
                 
         return formatted_candles
 
@@ -114,7 +118,6 @@ class Exchange(object):
     def update_candles(self, mkt_name, size, unit):
         
         interval = self.format_interval(size, unit)
-        print 'interval = {}'.format(interval)
 
         if (mkt_name not in self.markets.keys()):
             raise "Invalid mkt_name parameter for get_candles"
