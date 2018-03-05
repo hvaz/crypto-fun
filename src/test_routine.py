@@ -36,7 +36,7 @@ args = parser.parse_args()
 
 exchange_list = info_exchanges.keys() if args.exchanges == None else [x.lower() for x in args.exchanges]
 markets_list = None if args.markets == None else [m.upper() for m in args.markets]
-m_size = args.candles_m_size[0] if type(args.candles_m_unit) == list else args.candles_m_size
+m_size = args.candles_m_size[0] if type(args.candles_m_size) == list else args.candles_m_size
 m_unit = args.candles_m_unit[0] if type(args.candles_m_unit) == list  else args.candles_m_unit
 strategy = args.strategy[0]
 start = args.start[0] if type(args.start) == list else args.start
