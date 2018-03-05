@@ -105,6 +105,7 @@ class Market(object):
         if side == 'c2':
             total_c1 = (1 - fee) * total_c2 * close
             total_c2 = 0
+            sell_count += 1
 
         profits = total_c1 - 1.0
         return (profits, buy_count, sell_count)
