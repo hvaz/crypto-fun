@@ -79,6 +79,8 @@ class Market(object):
         total_c1 = 1.0
         total_c2 = 0
         side = 'c1'
+        buy_count = 0
+        sell_count = 0
 
         for i in range(end_calib, end - 1):
             close = float(c_list[i + 1]['close_price'])
@@ -86,11 +88,13 @@ class Market(object):
             if (close < (avg + stdev * buy_th) and side == 'c1'):
                 total_c2 = (1 - fee) * total_c1 / close
                 total_c1 = 0
+                buy_count += 1
                 side = 'c2'
 
             if (close > (avg + stdev * sell_th) and side == 'c2'):
                 total_c1 = (1 - fee) * total_c2 * close
                 total_c2 = 0
+                sell_count += 1
                 side = 'c1'
 
             if (updating):
@@ -103,7 +107,7 @@ class Market(object):
             total_c2 = 0
 
         profits = total_c1 - 1.0
-        return profits
+        return (profits, buy_count, sell_count)
 
 
     def test_hold_model(self, candle_object, start, end, calib_proportion):
@@ -130,22 +134,23 @@ class Market(object):
     def study_stats(self, candle_object, start, end, calib_proportion, updating=True):
         
         lim = 1000
-
         mmax = -2
         
-        print("Hold profit:", self.test_hold_model(candle_object, start, end, 0.2))
+        print("Hold profit:", self.test_hold_model(candle_object, start, end, calib_proportion))
         print("Avg and stdev:", self.avg_and_stdev(candle_object, start, end))
 
         for i in range(lim):
-            buy = -6*random.random()
-            sell = 6*random.random()
-            profit = self.test_stat_model(candle_object, start, end, buy, sell, calib_proportion, updating)
+            buy_th = -6*random.random()
+            sell_th = 6*random.random()
+            profit, buy_count, sell_count = \
+                self.test_stat_model(candle_object, start, end, buy_th, sell_th, calib_proportion, updating)
             if profit > mmax:
-                bestbuy = buy
-                bestsell = sell
+                bestbuy = buy_th
+                bestsell = sell_th
                 mmax = profit
-                print(buy, sell, profit)
-        
+                results = {"(buy_th, sell_th)": (buy_th, sell_th), \
+                        "(buy_count, sell_count)": (buy_count, sell_count), "profit": profit}
+                print results 
 
     def avg_and_stdev(self, candle_object, start, end):
         
