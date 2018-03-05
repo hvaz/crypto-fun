@@ -6,7 +6,7 @@ parser = argparse.ArgumentParser(description="Executing trading strategies for d
 
 parser.add_argument("--exchanges", metavar="EXCHANGES", type=str, nargs="+", help="List of exchanges to be used. Default value is list of all exchanges")
 
-parser.add_argument("--markets", metavar="MARKETS", type=str, nargs="+", help="List of market's symbols in which to test model. Default covers all markets of each exchange")
+parser.add_argument("--markets", metavar="MARKETS", type=str, nargs="+", help="List of market's symbols in which to test model. Default covers all defined markets for each exchange")
 
 parser.add_argument("--candles_m_size", metavar="CANDLES_M_SIZE", type=int, nargs=1, default=3, help="Candles m parameter's size used to determine their chronological extension. Check infos.py file for options. Default value is 3")
 
