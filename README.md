@@ -11,8 +11,10 @@ pip install requests
 ```
 python test_routine.py -h
 
-usage: test_routine.py [-h] --exchanges EXCHANGES [EXCHANGES ...] --markets
-                       MARKETS [MARKETS ...] [--candles_m_size CANDLES_M_SIZE]
+➜  src git:(master) python test_routine.py -h
+usage: test_routine.py [-h] [--exchanges EXCHANGES [EXCHANGES ...]]
+                       [--markets MARKETS [MARKETS ...]]
+                       [--candles_m_size CANDLES_M_SIZE]
                        [--candles_m_unit CANDLES_M_UNIT] --strategy STRATEGY
                        [--start START] [--end END] --calib_proportion
                        CALIB_PROPORTION [--updating_stat UPDATING_STAT]
@@ -27,10 +29,11 @@ Executing trading strategies for different crypto exchanges
 optional arguments:
   -h, --help            show this help message and exit
   --exchanges EXCHANGES [EXCHANGES ...]
-                        List of exchanges to be used. Mandatory
+                        List of exchanges to be used. Default value is list of
+                        all exchanges
   --markets MARKETS [MARKETS ...]
                         List of market's symbols in which to test model.
-                        Mandatory
+                        Default covers all defined markets for each exchange
   --candles_m_size CANDLES_M_SIZE
                         Candles m parameter's size used to determine their
                         chronological extension. Check infos.py file for
@@ -40,8 +43,8 @@ optional arguments:
                         chronological extension: Check infos.py file for
                         options. Default value is minute
   --strategy STRATEGY   Strategy to be tested. Options: ['ema', 'stat']
-  --start START         Index of candle from which to start executing strategy.
-												Default value is 10
+  --start START         Index of candle from which to start executing
+                        strategy. Default value is 10
   --end END             Index of candle in which to stop executing strategy.
                         Default value is 950
   --calib_proportion CALIB_PROPORTION
@@ -49,7 +52,7 @@ optional arguments:
                         test_hold
   --updating_stat UPDATING_STAT
                         Parameter to indicate whether stat strategy should
-                        update parameters often or not
+                        update parameters often or not. Default value is TRUE
   --ema_short EMA_SHORT_FACTOR
                         Parameter indicating short_factor parameter to be
                         passed to test_ema
