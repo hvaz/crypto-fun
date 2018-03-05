@@ -22,7 +22,7 @@ info_exchanges = { \
         "every_transaction_fee": True, \
         "api_endpoint": "https://api.hitbtc.com/api/2", \
         "data_ascending": True, \
-        "symbols": ["ETHBTC", "TRXBTC", "BTCUSD", "MIPSBTC", "BCHBTC"], \
+        "symbols": ["ETHBTC", "TRXBTC", "BTCUSD", "MIPSBTC", "BCHBTC", "XRPBTC"], \
         "candles_endpoint": "/public/candles/{}", \
         "candles_intervals": {'minute': {1: 'M1', 3: 'M3', 5: 'M5', 15: 'M15', 30: 'M30'}, \
                               'hour': {1: 'H1', 4: 'H4'}, 'day': {1: 'D1', 7: 'D7'}, 'month': {1: '1M'} \
