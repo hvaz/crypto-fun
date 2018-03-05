@@ -43,8 +43,8 @@ start = args.start[0] if type(args.start) == list else args.start
 end = args.end[0] if type(args.end) == list else args.end
 calib_proportion = args.calib_proportion[0]
 updating_stat = args.updating_stat[0] if type(args.updating_stat) == list else args.updating_stat
-short_factor = args.ema_short[0] if type(args.ema_short) == list else args.ema_short
-long_factor = args.ema_long[0] if type(args.ema_long) == list else args.ema_long
+ema_short = args.ema_short[0] if type(args.ema_short) == list else args.ema_short
+ema_long = args.ema_long[0] if type(args.ema_long) == list else args.ema_long
 ema_threshold = args.ema_threshold[0] if type(args.ema_threshold) == list else args.ema_threshold
 stat_buy_th = args.stat_buy_th[0] if type(args.stat_buy_th) == list else args.stat_buy_th
 stat_sell_th = args.stat_sell_th[0] if type(args.stat_sell_th) == list else args.stat_sell_th
@@ -97,7 +97,7 @@ for x in exchange_list:
 
 	mkt.study_stats(cur_candles, start, end, updating=updating_stat)
 
-print "Sample size: {} candles\n\n".format(NUM_CANDLES)
+print "\n\n*** Sample size: {} candles ***\n\n".format(NUM_CANDLES)
 
 ## print results
 for x, mkts_profits in profits.items():
