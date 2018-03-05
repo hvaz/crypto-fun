@@ -98,7 +98,7 @@ for x in exchange_list:
         hold_profit = mkt.test_hold_model(cur_candles, start, end, calib_proportion)
         mkt_profits["hold"] = hold_profit
 
-	mkt.study_stats(cur_candles, start, end, updating=updating_stat)
+	mkt.study_stats(cur_candles, start, end, calib_proportion, updating=updating_stat)
 
 print "\n\n*** Sample size: {} candles ***\n\n".format(NUM_CANDLES)
 

@@ -121,7 +121,7 @@ class Market(object):
         return profits
 
 
-    def study_stats(self, candle_object, start, end, updating=False):
+    def study_stats(self, candle_object, start, end, calib_proportion, updating=False):
         
         lim = 1000
 
@@ -132,7 +132,7 @@ class Market(object):
         for i in range(lim):
             buy = -6*random.random()
             sell = 6*random.random()
-            profit = self.test_stat_model(candle_object, start, end, buy, sell, True)
+            profit = self.test_stat_model(candle_object, start, end, buy, sell, calib_proportion, updating)
             if profit > mmax:
                 bestbuy = buy
                 bestsell = sell
