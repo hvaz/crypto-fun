@@ -48,7 +48,7 @@ class Market(object):
 
     # buy_th and sell_th are thresholds given in number of stdev
     # in general buy_th is negative and sell_th is positive
-    def test_stat_model(self, candle_object, start, end, buy_th, sell_th, calib_proportion, updating=False):
+    def test_stat_model(self, candle_object, start, end, buy_th, sell_th, calib_proportion, updating=True):
         
         fee = self.fee / 100
         end_calib = int(start + (end - start) * calib_proportion)
@@ -121,7 +121,7 @@ class Market(object):
         return profits
 
 
-    def study_stats(self, candle_object, start, end, calib_proportion, updating=False):
+    def study_stats(self, candle_object, start, end, calib_proportion, updating=True):
         
         lim = 1000
 

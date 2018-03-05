@@ -20,7 +20,7 @@ parser.add_argument("--end", metavar="END", type=int, nargs=1, default=950, help
 
 parser.add_argument("--calib_proportion", metavar="CALIB_PROPORTION", required=True, type=float, nargs=1, help="Calibration rate to be passed to test_stat and test_hold")
 
-parser.add_argument("--updating_stat", metavar="UPDATING_STAT", type=bool, nargs=1, help="Parameter to indicate whether stat strategy should update parameters often or not")
+parser.add_argument("--updating_stat", metavar="UPDATING_STAT", type=bool, nargs=1, default=True, help="Parameter to indicate whether stat strategy should update parameters often or not. Default value is TRUE")
 
 parser.add_argument("--ema_short", metavar="EMA_SHORT_FACTOR", type=float, nargs=1, help="Parameter indicating short_factor parameter to be passed to test_ema")
 
