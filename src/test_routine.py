@@ -4,9 +4,9 @@ from infos import info_exchanges, strategies
 
 parser = argparse.ArgumentParser(description="Executing trading strategies for different crypto exchanges")
 
-parser.add_argument("--exchanges", metavar="EXCHANGES", type=str, nargs="+", required=True, help="List of exchanges to be used. Mandatory")
+parser.add_argument("--exchanges", metavar="EXCHANGES", type=str, nargs="+", help="List of exchanges to be used. Default value is list of all exchanges")
 
-parser.add_argument("--markets", metavar="MARKETS", type=str, nargs="+", required=True, help="List of market's symbols in which to test model. Mandatory")
+parser.add_argument("--markets", metavar="MARKETS", type=str, nargs="+", help="List of market's symbols in which to test model. Default covers all markets of each exchange")
 
 parser.add_argument("--candles_m_size", metavar="CANDLES_M_SIZE", type=int, nargs=1, default=3, help="Candles m parameter's size used to determine their chronological extension. Check infos.py file for options. Default value is 3")
 
@@ -34,8 +34,8 @@ parser.add_argument("--stat_sell_th", metavar="STAT_SELL_TH", type=float, nargs=
 
 args = parser.parse_args()
 
-exchange_list = [x.lower() for x in args.exchanges]
-markets_list = [m.upper() for m in args.markets]
+exchange_list = info_exchanges.keys() if args.exchanges == None else [x.lower() for x in args.exchanges]
+markets_list = None if args.markets == None else [m.upper() for m in args.markets]
 m_size = args.candles_m_size[0] if type(args.candles_m_unit) == list else args.candles_m_size
 m_unit = args.candles_m_unit[0] if type(args.candles_m_unit) == list  else args.candles_m_unit
 strategy = args.strategy[0]
@@ -49,6 +49,8 @@ ema_threshold = args.ema_threshold[0] if type(args.ema_threshold) == list else a
 stat_buy_th = args.stat_buy_th[0] if type(args.stat_buy_th) == list else args.stat_buy_th
 stat_sell_th = args.stat_sell_th[0] if type(args.stat_sell_th) == list else args.stat_sell_th
 
+test_mkts = {x: markets_list if markets_list != None else info_exchanges[x]["symbols"] \
+            for x in exchange_list}
 
 ## check if arguments make sense
 if args.strategy[0] not in strategies:
@@ -59,13 +61,14 @@ for x in exchange_list:
         raise Exception("{} exchange not yet supported in our system. Please try again".format(x))
 
     exchange = info_exchanges[x]
-    for m in markets_list:
+    for m in test_mkts[x]:
         if m not in exchange["symbols"]:
             raise Exception("{} market not yet supported by exchange {} in our system. Please try again.".format(m, x))
 
 
-profits = {}
+
 ## instantiate exchanges, update candles, and run strategy
+profits = {}
 exchange_objs = []
 for x in exchange_list:
     exchange_info = info_exchanges[x]
@@ -74,7 +77,7 @@ for x in exchange_list:
     profits[x] = {}
     exchange_profits = profits[x]
 
-    for m in markets_list:
+    for m in test_mkts[x]:
         new_exchange.update_candles(m, m_size, m_unit)
         interval = new_exchange.format_interval(m_size, m_unit)
         mkt = new_exchange.markets[m]
