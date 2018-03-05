@@ -54,13 +54,19 @@ class Market(object):
         end_calib = int(start + (end - start) * calib_proportion)
         c_list = candle_object.candle_list
         
+        if end-start < 8:
+            return 0
+
+        if end_calib - start < 4:
+            end_calib = min(end, start+4)
+
         tot = 0
         n = 0
         for i in range(start, end_calib):
             close = float(c_list[i]['close_price'])
             tot += close
             n += 1
-       
+
         avg = tot / n
         tot = 0
         for i in range(start, end_calib):
@@ -128,6 +134,7 @@ class Market(object):
         mmax = -2
         
         print("Hold profit:", self.test_hold_model(candle_object, start, end, 0.2))
+        print("Avg and stdev:", self.avg_and_stdev(candle_object, start, end))
 
         for i in range(lim):
             buy = -6*random.random()
@@ -139,3 +146,24 @@ class Market(object):
                 mmax = profit
                 print(buy, sell, profit)
         
+
+    def avg_and_stdev(self, candle_object, start, end):
+        
+        c_list = candle_object.candle_list       
+
+        tot = 0
+        n = 0
+        for i in range(start, end):
+            close = float(c_list[i]['close_price'])
+            tot += close
+            n += 1
+
+        avg = tot / n
+        tot = 0
+        for i in range(start, end):
+            close = float(c_list[i]['close_price'])
+            tot += (close - avg)**2
+            
+        stdev = (tot / (n - 1))**0.5
+
+        return (avg, stdev)
