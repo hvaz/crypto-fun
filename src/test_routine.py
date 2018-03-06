@@ -28,9 +28,9 @@ parser.add_argument("--ema_long", metavar="EMA_LONG_FACTOR", type=float, nargs=1
 
 parser.add_argument("--ema_threshold", metavar="EMA_THREASHOLD", type=float, nargs=1, help="Parameter indicating threashold parameter to be passed to test_ema")
 
-parser.add_argument("--stat_buy_th", metavar="STAT_BUY_TH", type=float, nargs=1, help="Parameter indicating buy_th parameter to be passed to test_stat (negative number!)")
+parser.add_argument("--stat_buy_th", metavar="STAT_BUY_TH", type=float, nargs=1, default=-2.0, help="Parameter indicating buy_th parameter to be passed to test_stat (negative number!)")
 
-parser.add_argument("--stat_sell_th", metavar="STAT_SELL_TH", type=float, nargs=1, help="Parameter indicating sell_th parameter to be passed to test_stat (positive number!)")
+parser.add_argument("--stat_sell_th", metavar="STAT_SELL_TH", type=float, nargs=1, default=2.0, help="Parameter indicating sell_th parameter to be passed to test_stat (positive number!)")
 
 parser.add_argument("--sandbox", metavar="SANDBOX_PARAMS", nargs="+", help="Runs sandbox models with params passed as arguments")
 
