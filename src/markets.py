@@ -13,6 +13,28 @@ class Market(object):
                 self.candles[unit_dict[size]] = None
 
 
+    def avg_and_stdev(self, candle_object, start, end):
+        
+        c_list = candle_object.candle_list       
+
+        tot = 0
+        n = 0
+        for i in range(start, end):
+            close = float(c_list[i]['close_price'])
+            tot += close
+            n += 1
+
+        avg = tot / n
+        tot = 0
+        for i in range(start, end):
+            close = float(c_list[i]['close_price'])
+            tot += (close - avg)**2
+            
+        stdev = (tot / (n - 1))**0.5
+
+        return (avg, stdev)
+
+
     def test_ema_model(self, candle_object, start, end, short_factor, long_factor, threshold):
         
         ## adjust fee to be between 0 and 1 since it is given as percentage
@@ -152,23 +174,6 @@ class Market(object):
                         "(buy_count, sell_count - 1)": (buy_count, sell_count), "profit": profit}
                 print results 
 
-    def avg_and_stdev(self, candle_object, start, end):
+    def test_sandbox_model(self, params):
         
-        c_list = candle_object.candle_list       
-
-        tot = 0
-        n = 0
-        for i in range(start, end):
-            close = float(c_list[i]['close_price'])
-            tot += close
-            n += 1
-
-        avg = tot / n
-        tot = 0
-        for i in range(start, end):
-            close = float(c_list[i]['close_price'])
-            tot += (close - avg)**2
-            
-        stdev = (tot / (n - 1))**0.5
-
-        return (avg, stdev)
+        return

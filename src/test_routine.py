@@ -12,13 +12,13 @@ parser.add_argument("--candles_m_size", metavar="CANDLES_M_SIZE", type=int, narg
 
 parser.add_argument("--candles_m_unit", metavar="CANDLES_M_UNIT", type=str, nargs=1, default="minute", help="Candles m parameter's unit used to determine their chronological extension: Check infos.py file for options. Default value is minute")
 
-parser.add_argument("--strategy", metavar="STRATEGY", type=str, nargs=1, required=True, help="Strategy to be tested. Options: {}".format(strategies))
+parser.add_argument("--strategy", metavar="STRATEGY", type=str, nargs=1, help="Strategy to be tested. Options: {}".format(strategies))
 
 parser.add_argument("--start", metavar="START", type=int, nargs=1, default=10, help="Index of candle from which to start executing strategy. Default value is 10")
 
 parser.add_argument("--end", metavar="END", type=int, nargs=1, default=950, help="Index of candle in which to stop executing strategy. Default value is 950")
 
-parser.add_argument("--calib_proportion", metavar="CALIB_PROPORTION", required=True, type=float, nargs=1, help="Calibration rate to be passed to test_stat and test_hold")
+parser.add_argument("--calib_proportion", metavar="CALIB_PROPORTION", type=float, nargs=1, help="Calibration rate to be passed to test_stat and test_hold")
 
 parser.add_argument("--updating_stat", metavar="UPDATING_STAT", type=bool, nargs=1, default=True, help="Parameter to indicate whether stat strategy should update parameters often or not. Default value is TRUE")
 
@@ -32,16 +32,20 @@ parser.add_argument("--stat_buy_th", metavar="STAT_BUY_TH", type=float, nargs=1,
 
 parser.add_argument("--stat_sell_th", metavar="STAT_SELL_TH", type=float, nargs=1, help="Parameter indicating sell_th parameter to be passed to test_stat (positive number!)")
 
+parser.add_argument("--sandbox", metavar="SANDBOX_PARAMS", nargs="+", help="Runs sandbox models with params passed as arguments")
+
 args = parser.parse_args()
 
+
+sandbox_params = args.sandbox
 exchange_list = info_exchanges.keys() if args.exchanges == None else [x.lower() for x in args.exchanges]
 markets_list = None if args.markets == None else [m.upper() for m in args.markets]
-m_size = args.candles_m_size[0] if type(args.candles_m_size) == list else args.candles_m_size
-m_unit = args.candles_m_unit[0] if type(args.candles_m_unit) == list  else args.candles_m_unit
-strategy = args.strategy[0]
+candles_m_size = args.candles_m_size[0] if type(args.candles_m_size) == list else args.candles_m_size
+candles_m_unit = args.candles_m_unit[0] if type(args.candles_m_unit) == list  else args.candles_m_unit
+strategy = args.strategy[0] if sandbox_params == None else "sandbox"
 start = args.start[0] if type(args.start) == list else args.start
 end = args.end[0] if type(args.end) == list else args.end
-calib_proportion = args.calib_proportion[0]
+calib_proportion = args.calib_proportion[0] if type(args.calib_proportion) == list else (0.0 if strategy == "ema" else 0.2)
 updating_stat = args.updating_stat[0] if type(args.updating_stat) == list else args.updating_stat
 ema_short = args.ema_short[0] if type(args.ema_short) == list else args.ema_short
 ema_long = args.ema_long[0] if type(args.ema_long) == list else args.ema_long
@@ -53,7 +57,7 @@ test_mkts = {x: markets_list if markets_list != None else info_exchanges[x]["sym
             for x in exchange_list}
 
 ## check if arguments make sense
-if args.strategy[0] not in strategies:
+if strategy not in strategies:
     raise Exception("There is no implemented strategy named {}".format(strategy))
 
 for x in exchange_list:
@@ -78,8 +82,8 @@ for x in exchange_list:
     exchange_profits = profits[x]
 
     for m in test_mkts[x]:
-        new_exchange.update_candles(m, m_size, m_unit)
-        interval = new_exchange.format_interval(m_size, m_unit)
+        new_exchange.update_candles(m, candles_m_size, candles_m_unit)
+        interval = new_exchange.format_interval(candles_m_size, candles_m_unit)
         mkt = new_exchange.markets[m]
         
         mkt_strategy_profit = 0
@@ -89,6 +93,9 @@ for x in exchange_list:
 
         elif (strategy == "stat"):
             mkt_strategy_profit = mkt.test_stat_model(cur_candles, start, end, stat_buy_th, stat_sell_th, calib_proportion, updating=updating_stat)[0]
+
+        elif (strategy == "sandbox"):
+            mkt_strategy_profit = mkt.test_sandbox_model(sandbox_params)
         
         exchange_profits[m] = {}
         mkt_profits = exchange_profits[m]
@@ -100,10 +107,26 @@ for x in exchange_list:
 
 	mkt.study_stats(cur_candles, start, end, calib_proportion, updating=updating_stat)
 
-print "\n\n*** Sample size: {} candles ***\n\n".format(NUM_CANDLES)
+print "\n\n*************************************************************************************************\n"
+print "------ TEST ENVIRONMENT INFO ------\n"
+print "*** Sample size: {} candles ***\n".format(NUM_CANDLES)
+print "*** Arguments *** \n"
+print "-----> strategy = {}".format(strategy)
+print "-----> exchanges = {}".format(exchange_list)
+print "-----> markets = {}".format(test_mkts)
+print "-----> (candles_m_size, candles_m_unit) = ({}, {})".format(candles_m_size, candles_m_unit)
+print "-----> (start, end) = ({}, {})".format(start, end)
+print "-----> (calib_proportion, updating_stat, stat_buy_th, stat_sell_th) = ({}, {}, {}, {})".format(calib_proportion, updating_stat, stat_buy_th, stat_sell_th)
+print "-----> (ema_short, ema_long, ema_threshold)= ({}, {}, {})".format(ema_short, ema_long, ema_threshold)
+print "-----> sandbox_params = {}".format(sandbox_params)
+print "\n*************************************************************************************************\n\n"
 
+
+print "vvvvvvvvvvvv RESULTS vvvvvvvvvvvvvv"
 ## print results
 for x, mkts_profits in profits.items():
+    
+    print "\n\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n"
     print "---> Exchange: {}\n".format(x)
 
     for mkt, strat_profits in mkts_profits.items():
@@ -120,8 +143,8 @@ for x, mkts_profits in profits.items():
 
             else:
                 print "---------> Market: {} ........... Strategy: {} ............ Profit: {}".format(mkt, strat_name, profit)
+        
+        print "\n .................................................................................\n"
 
 
-        print "\n"
-
-    print "\n\n\n"
+    print "\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\n"
