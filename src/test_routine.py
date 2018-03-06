@@ -118,7 +118,7 @@ print "-----> (candles_m_size, candles_m_unit) = ({}, {})".format(candles_m_size
 print "-----> (start, end) = ({}, {})".format(start, end)
 print "-----> calib_proportion = {}".format(calib_proportion)
 print "-----> (stat_buy_th, stat_sell_th, updating_stat) = ({}, {}, {})".format(stat_buy_th, stat_sell_th, updating_stat)
-print "-----> (ema_short, ema_long, ema_threshold)= ({}, {}, {})".format(ema_short, ema_long, ema_threshold)
+print "-----> (ema_short, ema_long, ema_threshold) = ({}, {}, {})".format(ema_short, ema_long, ema_threshold)
 print "-----> sandbox_params = {}".format(sandbox_params)
 print "\n*************************************************************************************************\n\n"
 
