@@ -51,9 +51,9 @@ class Candles(object):
 
         return ema_list
 
-    def get_vida_list(self, factor):
-        vida_list = []
-        current_vida = -1
+    def get_vidya_list(self, factor):
+        vidya_list = []
+        current_vidya = -1
 
         for candle in self.candle_list:
             close = float(candle['close_price'])
@@ -61,11 +61,11 @@ class Candles(object):
             cmo = (open - close) / (open + close)
             current_factor = abs(cmo)*factor
 
-            if current_vida == -1:
-                current_vida = close
+            if current_vidya == -1:
+                current_vidya = close
             else:
-                current_vida = close * current_factor + current_vida * (1-current_factor)
+                current_vidya = close * current_factor + current_vidya * (1-current_factor)
 
-            vida_list.append(current_vida)
+            vidya_list.append(current_vidya)
         
-        return vida_list
+        return vidya_list
