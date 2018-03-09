@@ -37,11 +37,35 @@ class Candles(object):
     # assumes data is in ascending time
     def get_ema_list(self, factor):
         ema_list = []
-        current_ema = 0
+        current_ema = - 1
 
         for candle in self.candle_list:
             close = float(candle['close_price'])
-            current_ema = close * factor + current_ema * (1 - factor)
+            
+            if current_ema == -1:
+                current_ema = close
+            else:
+                current_ema = close * factor + current_ema * (1 - factor)
+           
             ema_list.append(current_ema)
 
         return ema_list
+
+    def get_vida_list(self, factor):
+        vida_list = []
+        current_vida = -1
+
+        for candle in self.candle_list:
+            close = float(candle['close_price'])
+            open = float(candle['open_price'])
+            cmo = (open - close) / (open + close)
+            current_factor = abs(cmo)*factor
+
+            if current_vida == -1:
+                current_vida = close
+            else:
+                current_vida = close * current_factor + current_vida * (1-current_factor)
+
+            vida_list.append(current_vida)
+        
+        return vida_list
