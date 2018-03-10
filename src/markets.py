@@ -174,6 +174,6 @@ class Market(object):
                         "(buy_count, sell_count - 1)": (buy_count, sell_count), "profit": profit}
                 print results 
 
-    def test_sandbox_model(self, params):
+    def test_sandbox_model(self, candle_object, params):
         
         return

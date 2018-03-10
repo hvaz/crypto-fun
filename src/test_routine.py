@@ -89,7 +89,7 @@ def start_testing(args):
                                       args["stat_sell_th"], args["calib_proportion"], updating=args["updating_stat"])[0]
 
             elif (args["strategy"] == "sandbox"):
-                mkt_strategy_profit = mkt.test_sandbox_model(sandbox_params)
+                mkt_strategy_profit = mkt.test_sandbox_model(cur_candles, sandbox_params)
             
             exchange_profits[m] = {}
             mkt_profits = exchange_profits[m]
