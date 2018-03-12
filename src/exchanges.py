@@ -19,7 +19,7 @@ class Exchange(object):
         self.data_ascending = info['data_ascending']
 
         for s_name in info['symbols']:
-            self.markets[s_name] = Market(s_name, self.percentage_fee, self.candles_intervals)
+            self.markets[s_name] = Market(s_name, self.name, self.percentage_fee, self.candles_intervals)
 
 
     def _format_candles(self, candles):

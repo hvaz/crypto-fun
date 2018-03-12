@@ -1,10 +1,12 @@
 import random
+import colorama
 
 class Market(object):
 
-    def __init__(self, name, percentage_fee, intervals):
+    def __init__(self, name, exchange_name, percentage_fee, intervals):
         
         self.name = name
+        self.exchange_name = exchange_name
         self.fee = percentage_fee
         self.candles = {}
         
@@ -157,9 +159,15 @@ class Market(object):
         
         lim = 1000
         mmax = -2
+        hold_profit = self.test_hold_model(candle_object, start, end, calib_proportion)
         
-        print("Hold profit:", self.test_hold_model(candle_object, start, end, calib_proportion))
+        colorama.init()
+        print "\n" + "." * 100 + "\n"
+        print "Exchange: {}".format(self.exchange_name)
+        print "Market: {}\n".format(self.name)
+        print("Hold profit:", hold_profit)
         print("Avg and stdev:", self.avg_and_stdev(candle_object, start, end))
+        print "\n"
 
         for i in range(lim):
             buy_th = -6*random.random()
@@ -172,7 +180,18 @@ class Market(object):
                 mmax = profit
                 results = {"(buy_th, sell_th)": (buy_th, sell_th), \
                         "(buy_count, sell_count - 1)": (buy_count, sell_count), "profit": profit}
-                print results 
+                
+                if results["profit"] == 0:
+                    print (colorama.Fore.YELLOW + str(results))
+
+                elif results["profit"] >= hold_profit:
+                    print (colorama.Fore.GREEN + str(results))
+
+                else:
+                    print (colorama.Fore.RED + str(results))
+        
+        print(colorama.Fore.RESET)
+        colorama.deinit()
 
     def test_sandbox_model(self, params):
         ## adjust fee to be between 0 and 1 since it is given as percentage                              
