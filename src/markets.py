@@ -174,6 +174,34 @@ class Market(object):
                         "(buy_count, sell_count - 1)": (buy_count, sell_count), "profit": profit}
                 print results 
 
-    def test_sandbox_model(self, candle_object, params):
-        
+    def test_sandbox_model(self, params):
+        ## adjust fee to be between 0 and 1 since it is given as percentage                              
+        fee = self.fee / 100
+        c_list = candle_object.candle_list
+        short_ema_list = candle_object.get_ema_list(short_factor)
+        long_ema_list = candle_object.get_ema_list(long_factor)
+
+        # the market is c2/c1                                                                            
+        total_c1 = 1.0
+        total_c2 = 0.0
+        side = 'c1'
+
+        for i in range(start, end):
+            close = float(c_list[i]['close_price'])
+
+            if (short_ema_list[i] > (long_ema_list[i] * (1 + threshold)) and side == 'c1'):
+                total_c2 = (1 - fee) * total_c1 / close
+                total_c1 = 0
+                side = 'c2'
+
+            if (short_ema_list[i] < (long_ema_list[i] * (1 - threshold)) and side == 'c2'):
+                total_c1 = (1 - fee) * total_c2 * close
+                total_c2 = 0
+                side = 'c1'
+
+        if side == 'c2':
+            total_c1 = (1 - fee) * total_c2 * close
+            total_c2 = 0
+
+
         return
