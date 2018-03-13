@@ -1,5 +1,5 @@
 import random
-import colorama
+from printing import print_comparing_hold
 
 class Market(object):
 
@@ -161,7 +161,6 @@ class Market(object):
         mmax = -2
         hold_profit = self.test_hold_model(candle_object, start, end, calib_proportion)
         
-        colorama.init()
         print "\n" + "." * 100 + "\n"
         print "Exchange: {}".format(self.exchange_name)
         print "Market: {}\n".format(self.name)
@@ -181,20 +180,12 @@ class Market(object):
                 results = {"(buy_th, sell_th)": (buy_th, sell_th), \
                         "(buy_count, sell_count - 1)": (buy_count, sell_count), "profit": profit}
                 
-                if results["profit"] == 0:
-                    print (colorama.Fore.YELLOW + str(results))
+                print_comparing_hold(str(results), results["profit"], hold_profit)
 
-                elif results["profit"] >= hold_profit:
-                    print (colorama.Fore.GREEN + str(results))
-
-                else:
-                    print (colorama.Fore.RED + str(results))
+    def test_sandbox_model(self, candle_object, params):
         
-        print(colorama.Fore.RESET)
-        colorama.deinit()
-
-    def test_sandbox_model(self, params):
-        ## adjust fee to be between 0 and 1 since it is given as percentage                              
+        short_factor, long_factor, threshold = float(params[0]), float(params[1]), float(params[2])
+        start, end = int(params[3]), int(params[4])
         fee = self.fee / 100
         c_list = candle_object.candle_list
         short_ema_list = candle_object.get_ema_list(short_factor)
@@ -222,5 +213,5 @@ class Market(object):
             total_c1 = (1 - fee) * total_c2 * close
             total_c2 = 0
 
-
-        return
+        profits = total_c1 - 1.0
+        return profits

@@ -1,6 +1,7 @@
 from exchanges import Exchange, NUM_CANDLES
 from infos import info_exchanges, strategies
-from parser import set_parser, handle_args 
+from parser import set_parser, handle_args
+from printing import print_comparing_hold
 
 def print_env_info(args):
     print "\n\n" + "*" * 100 + "\n"
@@ -48,20 +49,27 @@ def print_model_results(profits, args):
         
         print "\n" + "x" * 100 +  "\n"
         print "---> Exchange: {}\n".format(x)
+        print "\n" + "." * 100 +  "\n"
 
         for mkt, strat_profits in mkts_profits.items():
+            hold_profit = strat_profits["hold"]
+            print arrows + " Market: {} / {}\n".format(mkt, x)
+
             for strat_name, profit in strat_profits.items():
                 if strat_name == "stat":
-                    print arrows + " Market: {} ".format(mkt) + dots + \
-                            " Strategy: stat updating={} ".format(args["updating_stat"]) + dots + " Profit: {}".format(profit)
+                    print_info = "Strategy: stat updating={} ".format(args["updating_stat"]) + dots + \
+                                 " Profit: {}".format(profit)
                 else:
-                    print arrows + " Market: {} ".format(mkt) + dots + " Strategy: {} ".format(strat_name) + \
-                          dots * 2 + "..." + " Profit: {}".format(profit)
-            
-            print "\n" + "." * 100 +  "\n"
+                    print_info = "Strategy: {} ".format(strat_name) + dots * 2 + "..." + \
+                                 " Profit: {}".format(profit)
 
+                if strat_name != "hold":
+                    print_comparing_hold(print_info, profit, hold_profit)
+                else:
+                    print print_info
+
+            print "." * 100 +  "\n"
         print "\n"+ "x" * 100 + "\n\n"
-
 
 def start_testing(args):
     ## instantiate exchanges, update candles, and run strategy
@@ -82,14 +90,15 @@ def start_testing(args):
             mkt_strategy_profit = 0
             cur_candles = mkt.candles[interval]
             if (args["strategy"] == "ema"):
-                mkt_strategy_profit = mkt.test_ema_model(cur_candles, start, end, ema_short, ema_long, ema_threshold)
+                mkt_strategy_profit = mkt.test_ema_model(cur_candles, args["start"], args["end"], \
+                                      args["ema_short"], args["ema_long"], args["ema_threshold"])
 
             elif (args["strategy"] == "stat"):
                 mkt_strategy_profit = mkt.test_stat_model(cur_candles, args["start"], args["end"], args["stat_buy_th"], \
                                       args["stat_sell_th"], args["calib_proportion"], updating=args["updating_stat"])[0]
 
             elif (args["strategy"] == "sandbox"):
-                mkt_strategy_profit = mkt.test_sandbox_model(cur_candles, sandbox_params)
+                mkt_strategy_profit = mkt.test_sandbox_model(cur_candles, args["sandbox_params"])
             
             exchange_profits[m] = {}
             mkt_profits = exchange_profits[m]
