@@ -51,6 +51,7 @@ class Candles(object):
 
         return ema_list
 
+
     def get_vidya_list(self, factor):
         vidya_list = []
         current_vidya = -1

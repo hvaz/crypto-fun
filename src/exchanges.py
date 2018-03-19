@@ -4,6 +4,7 @@ from datetime import datetime
 
 from markets import Market
 from candles import Candles
+from utils import active_internet, str_to_dict
 
 NUM_CANDLES = 1000
 
@@ -74,9 +75,25 @@ class Exchange(object):
 
         return {'url': url, 'payload': payload}
 
+    def _get_offline_candles(self, filename):
+        try:
+            with open(filename, 'r') as f:
+                candles = f.read()[1:-2].split("}, ")
+                candle_data = [str_to_dict(c + "}") for c in candles]
+                print candle_data
+
+        except Exception as e:
+            print e
+        else: 
+            return candle_data 
+
 
     def _get_candles_data(self, mkt_name, interval, target):
         filename = 'exchange=' + self.name + '_mkt=' + mkt_name + '_data=candles_interval=' + interval + '.txt'
+
+        if (not active_internet()):
+            return self._get_offline_candles(filename)
+        
         with open(filename, 'a') as f:
             with requests.Session() as session:
                 candles_count = 0
@@ -98,7 +115,7 @@ class Exchange(object):
                     if (r.status_code != 200):
                         raise r.raise_for_status()
 
-                    #f.write(str(formatted_candles))
+                    f.write(str(formatted_candles))
                 
         return formatted_candles
 
