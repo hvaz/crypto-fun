@@ -2,4 +2,7 @@
 *.pyc
 *.DS_Store
 
+*.txt
+!requirements.txt
+
 keys.py
