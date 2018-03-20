@@ -44,6 +44,8 @@ def print_env_info(args):
     print "-----> (ema_short, ema_long, ema_threshold) = ({}, {}, {})"\
             .format(args["ema_short"], args["ema_long"], args["ema_threshold"])
 
+    #print "-----> sandbox_params = " + ", ".join(args["sandbox_params"])
+
     print "\n" + "*" * 100  + "\n\n"
 
 
@@ -101,10 +103,11 @@ def apply_model(strategy, args, mkt, interval):
         elif strategy == "sandbox":
             mkt_strategy_profit = mkt.test_sandbox_model(cur_candles, args["sandbox_params"])
 
-        return mkt_strategy_profit
-
     except Exception as e:
         print e
+
+    else:
+        return mkt_strategy_profit
 
 
 def start_testing(args):
