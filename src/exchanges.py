@@ -80,7 +80,6 @@ class Exchange(object):
             with open(filename, 'r') as f:
                 candles = f.read()[1:-2].split("}, ")
                 candle_data = [str_to_dict(c + "}") for c in candles]
-                print candle_data
 
         except Exception as e:
             print e
@@ -89,12 +88,13 @@ class Exchange(object):
 
 
     def _get_candles_data(self, mkt_name, interval, target):
-        filename = 'exchange=' + self.name + '_mkt=' + mkt_name + '_data=candles_interval=' + interval + '.txt'
+        filename = './candles_txt_data/' + 'exchange=' + self.name + '_mkt=' + mkt_name \
+                   + '_data=candles_interval=' + interval + '.txt'
 
         if (not active_internet()):
             return self._get_offline_candles(filename)
         
-        with open(filename, 'a') as f:
+        with open(filename, 'w') as f:
             with requests.Session() as session:
                 candles_count = 0
                 while (candles_count < target):

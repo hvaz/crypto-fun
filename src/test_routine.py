@@ -2,12 +2,18 @@ from exchanges import Exchange, NUM_CANDLES
 from infos import info_exchanges, strategies
 from parser import set_parser, handle_args
 from printing import print_comparing_hold
+from utils import active_internet
 import logging
 
 def print_env_info(args):
     print "\n\n" + "*" * 100 + "\n"
 
     print "------ TEST ENVIRONMENT INFO ------\n"
+
+    if not active_internet():
+        print "Internet connection seems to be offline. Test will use the candle data available offline\n"
+    else:
+        print "Internet connection is active. Test using most up to date candles data\n"
 
     print "*** Sample size: {} candles ***\n"\
             .format(NUM_CANDLES)
