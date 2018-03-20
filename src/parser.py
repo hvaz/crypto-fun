@@ -58,11 +58,14 @@ def format_args(args):
         if a == "exchanges":
             args[a] = info_exchanges.keys() if args["exchanges"] == None \
                       else [x.lower() for x in args["exchanges"]]
+
                               
         elif a != "markets":
             val = args[a]
             if type(val) == list and len(val) == 1:
                 args[a] = val[0]
+            elif val == None:
+                args[a] = []
 
     if args["strategy"] == "ema":
         args["calib_proportion"] = 0.0

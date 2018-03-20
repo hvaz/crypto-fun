@@ -11,9 +11,9 @@ def print_env_info(args):
     print "------ TEST ENVIRONMENT INFO ------\n"
 
     if not active_internet():
-        print "Internet connection seems to be offline. Test will use the candle data available offline\n"
+        print "Internet connection seems to be OFFLINE. Tests will use the candle data available offline\n"
     else:
-        print "Internet connection is active. Test using most up to date candles data\n"
+        print "Internet connection is ACTIVE. Test using most up to date candles data\n"
 
     print "*** Sample size: {} candles ***\n"\
             .format(NUM_CANDLES)
@@ -44,7 +44,7 @@ def print_env_info(args):
     print "-----> (ema_short, ema_long, ema_threshold) = ({}, {}, {})"\
             .format(args["ema_short"], args["ema_long"], args["ema_threshold"])
 
-    #print "-----> sandbox_params = " + ", ".join(args["sandbox_params"])
+    print "-----> sandbox_params = " + ", ".join(args["sandbox_params"])
 
     print "\n" + "*" * 100  + "\n\n"
 
@@ -71,10 +71,7 @@ def print_model_results(profits, args):
                     print_info = "Strategy: {} ".format(strat_name) + dots * 2 + "..." + \
                                  " Profit: {}".format(profit)
 
-                if strat_name != "hold":
-                    print_comparing_hold(print_info, profit, hold_profit)
-                else:
-                    print print_info
+                print_comparing_hold(print_info, profit, hold_profit)
 
             print "." * 100 +  "\n"
 
