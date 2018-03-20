@@ -1,19 +1,23 @@
 import ccxt
 import json
 from keys import keys
+from utils import str_to_dict
 
 class ExchangeTrader():
 
     def __init__(self, exchange_name):
-        self.exchange = getattr(ccxt, exchange_name)({
-            'apiKey': keys['exchange_name']['public'],
-            'secret': keys['exchange_name']['private']
-        })
+        try:
+            self.exchange = getattr(ccxt, exchange_name)({
+                'apiKey': keys[exchange_name]['apiKey'],
+                'secret': keys[exchange_name]['secret']
+            })
+        except Exception as e:
+            raise e
+        else:
+            self.orders = []
 
-        self.orders = []
 
-
-    def _make_order(self, mkt_symbol, side='buy', amount, price=None, order_type='limit'):
+    def _make_order(self, mkt_symbol, amount, price=None, side='buy', order_type='limit'):
         if side not in ['buy', 'sell']:
             raise ValueError("make order: -side- parameter must be either 'buy' or 'sell'")
         if order_type not in ['limit', 'market']:
@@ -32,27 +36,27 @@ class ExchangeTrader():
                 else:
                     response = self.exchange.create_market_sell_order(mkt_symbol, amount)
         except:
-            print e
+            raise e
         else:
-            order_id = str_to_dict(response)['id']
-            order_info = {'order_id': order_id, 'mkt_symbol': mkt_symbol, \
-                    'side': side, 'amount': amount, 'price': price, 'order_type': order_type}
+            order_id = response['id']
+            order_info = {'id': order_id, 'mkt_symbol': mkt_symbol, \
+                    'side': side, 'amount': amount, 'price': price, 'type': order_type}
             self.orders.append(order_info)
             return order_id
 
 
     def buy(self, mkt_symbol, amount, price=None, limit=True):
         if limit:
-            self._make_order(side='buy', amount, price, order_type='limit')
+            self._make_order(mkt_symbol, amount, price, side='buy', order_type='limit')
         else:
-            self._make_order(side='buy', amount, price, order_type='market')
+            self._make_order(mkt_symbol, amount, price, side='buy', order_type='market')
 
 
-    def sell(self, amount, price, limit=True):
+    def sell(self, mkt_symbol, amount, price, limit=True):
         if limit:
-            self._make_order(mkt_symbol, side='sell', amount, price, order_type='limit')
+            self._make_order(mkt_symbol, amount, price, side='sell', order_type='limit')
         else:
-            self._make_order(mkt_symbol, side='sell', amount, price, order_type='market')
+            self._make_order(mkt_symbol, amount, price, side='sell', order_type='market')
 
             
     def cancel_order(self, order_id):
@@ -79,7 +83,7 @@ class ExchangeTrader():
             Return Value: dictionary as specified in https://github.com/ccxt/ccxt/wiki/Manual#order-structure
         '''
         if self.exchange.has['fetchOrder']:
-            order = self.exchange.fetch_order[order_id]
+            order = self.exchange.fetch_order(order_id)
             return order
         else:
             return None
@@ -95,8 +99,8 @@ class ExchangeTrader():
         '''
         status = None
         try:
-            status = self.full_order_info['status']
+            status = self.full_order_info(order_id)['status']
         except Exception as e:
-            print e
+            raise e
         finally:
             return status
