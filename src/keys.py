@@ -1,10 +1,10 @@
 keys = { \
-    "hitbtc": { \
-        "public": "", \
-        "private": "" \
+    "hitbtc2": { \
+        "apiKey": "", \
+        "secret": "" \
     }, \
     "binance": { \
-        "public": "", \
-        "private": "", \
+        "apiKey": "", \
+        "secret": "", \
     }
 }
