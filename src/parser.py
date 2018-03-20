@@ -60,9 +60,9 @@ def format_args(args):
                       else [x.lower() for x in args["exchanges"]]
                               
         elif a != "markets":
-                val = args[a]
-                if type(val) == list and len(val) == 1:
-                    args[a] = val[0]
+            val = args[a]
+            if type(val) == list and len(val) == 1:
+                args[a] = val[0]
 
     if args["strategy"] == "ema":
         args["calib_proportion"] = 0.0
