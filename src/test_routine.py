@@ -104,7 +104,7 @@ def apply_model(strategy, args, mkt, interval):
             mkt_strategy_profit = mkt.test_sandbox_model(cur_candles, args["sandbox_params"])
 
     except Exception as e:
-        print e
+        raise e
 
     else:
         return mkt_strategy_profit
