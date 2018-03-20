@@ -246,4 +246,4 @@ class Market(object):
             total_c2 = 0
 
         profits = total_c1 - 1.0
-        return profits
+        return (profits, buy_count, sell_count)
