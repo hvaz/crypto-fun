@@ -1,42 +1,5 @@
 import time
 
-def get_average(candle_list, start = -1, end = -1):
-
-    if start == -1:
-        start =0
-
-    if end == -1:
-        end = len(candle_list)
-
-    n = 0
-    tot = 0.0
-
-    for i in range(start, end):
-        close = candle_list[i]['closing_price']
-        tot += close
-        n += 1
-        
-    return (tot / n)
-
-def get_stdev(candle_list, start, end):
-
-    if start == -1:
-        start =0
-
-    if end == -1:
-        end = len(candle_list)
-
-    n = 0
-    tot = 0.0
-    avg = get_average(candle_list, start, end)
-
-    for i in range(start, end):
-        close = candle_list[i]['closing_price']
-        tot += (close - avg)**2
-        n += 1
-
-    return (tot / n)**0.5
-
 # if the market is c2/c1, quantity is the quantity of c2 that will be bought on each trade
 
 def stat_trade(exchange, market, quantity):
@@ -112,4 +75,3 @@ def stat_trade(exchange, market, quantity):
 
             side = 'c1'
             continue
-

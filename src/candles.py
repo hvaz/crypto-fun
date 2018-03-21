@@ -34,6 +34,37 @@ class Candles(object):
         self.candle_list = data
 
 
+    def get_average(self, start=-1, end=-1):
+        start = 0 if start == -1 else start
+        end = len(self.candle_list) if end == -1 else end
+        
+        n = 0
+        tot = 0.0
+
+        for i in range(start, end):
+            close = self.candle_list[i]['closing_price']
+            tot += close
+            n += 1
+            
+        return (tot / n)
+
+
+    def get_stdev(start=-1, end=-1):
+        start = 0 if start == -1 else start
+        end = len(self.candle_list) if end == -1 else end
+        
+        n = 0
+        tot = 0.0
+        avg = self.get_average(start, end)
+
+        for i in range(start, end):
+            close = self.candle_list[i]['closing_price']
+            tot += (close - avg)**2
+            n += 1
+
+        return (tot / n)**0.5
+
+
     # assumes data is in ascending time
     def get_ema_list(self, factor):
         ema_list = []
@@ -57,15 +88,16 @@ class Candles(object):
         current_vidya = -1
 
         for candle in self.candle_list:
-            close = float(candle['close_price'])
-            open = float(candle['open_price'])
-            cmo = (open - close) / (open + close)
-            current_factor = abs(cmo)*factor
+            close_price = float(candle['close_price'])
+            open_price = float(candle['open_price'])
+            cmo = (open_price - close_price) / (open_price + close_price)
+            current_factor = abs(cmo) * factor
 
             if current_vidya == -1:
-                current_vidya = close
+                current_vidya = close_price
             else:
-                current_vidya = close * current_factor + current_vidya * (1-current_factor)
+                current_vidya = close_price * current_factor 
+                                + current_vidya * (1-current_factor)
 
             vidya_list.append(current_vidya)
         
