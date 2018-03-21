@@ -17,7 +17,7 @@ def set_parser():
     parser.add_argument("--candles_m_unit", metavar="CANDLES_M_UNIT", type=str, nargs=1, default="minute", \
             help="Candles m parameter's unit used to determine their chronological extension: Check infos.py file for options. Default value is minute")
 
-    parser.add_argument("--strategy", metavar="STRATEGY", type=str, nargs=1, choices=strategies, \
+    parser.add_argument("--strategy", metavar="STRATEGY", type=str, nargs=1, choices=strategies, required=True,\
             help="Strategy to be tested")
 
     parser.add_argument("--start", metavar="START", type=int, nargs=1, default=10, \

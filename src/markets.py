@@ -15,28 +15,6 @@ class Market(object):
                 self.candles[unit_dict[size]] = None
 
 
-    def avg_and_stdev(self, candle_object, start, end):
-        
-        c_list = candle_object.candle_list       
-
-        tot = 0
-        n = 0
-        for i in range(start, end):
-            close = float(c_list[i]['close_price'])
-            tot += close
-            n += 1
-
-        avg = tot / n
-        tot = 0
-        for i in range(start, end):
-            close = float(c_list[i]['close_price'])
-            tot += (close - avg)**2
-            
-        stdev = (tot / (n - 1))**0.5
-
-        return (avg, stdev)
-
-
     def test_ema_model(self, candle_object, start, end, short_factor, long_factor, threshold):
         
         ## adjust fee to be between 0 and 1 since it is given as percentage
@@ -141,14 +119,14 @@ class Market(object):
         total_c1 = 1.0
         total_c2 = 0.0
 
-        end_calib = int(start + calib_proportion * (end-start))
+        end_calib = int(start + calib_proportion * (end - start))
         
-        close = float(candle_list[end_calib]['close_price'])
-        total_c2 = (1 - fee) * total_c1 / close
+        close_price = float(candle_list[end_calib]['close_price'])
+        total_c2 = (1 - fee) * total_c1 / close_price
         total_c1 = 0
 
-        close = float(candle_list[end]['close_price'])
-        total_c1 = (1 - fee) * total_c2 * close
+        close_price = float(candle_list[end]['close_price'])
+        total_c1 = (1 - fee) * total_c2 * close_price
         total_c2 = 0
 
         profits = total_c1 - 1.0
@@ -164,10 +142,10 @@ class Market(object):
         print "\n" + "." * 100 + "\n"
         print "Exchange: {}".format(self.exchange_name)
         print "Market: {}\n".format(self.name)
-        print("Hold profit:", hold_profit)
-        print("Avg and stdev:", self.avg_and_stdev(candle_object, start, end))
-        print "\n"
-
+        print "Hold profit:", hold_profit
+        print "Avg = {} ....... Std = {}\n".format(candle_object.get_avg(start, end), \
+                                                 candle_object.get_std(start, end))
+        
         for i in range(lim):
             buy_th = -6*random.random()
             sell_th = 6*random.random()

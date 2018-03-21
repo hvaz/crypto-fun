@@ -28,13 +28,15 @@ Candles consist of a list of candles obeying to the following format:
 OBS: Data is returned in ascending order. Oldest first, newest last.
 """
 
+NUM_CANDLES = 1000
+
 class Candles(object):
     def __init__(self, interval, data):
         self.interval = interval
         self.candle_list = data
 
 
-    def get_average(self, start=-1, end=-1):
+    def get_avg(self, start=-1, end=-1):
         start = 0 if start == -1 else start
         end = len(self.candle_list) if end == -1 else end
         
@@ -42,24 +44,24 @@ class Candles(object):
         tot = 0.0
 
         for i in range(start, end):
-            close = self.candle_list[i]['closing_price']
-            tot += close
+            close_price = self.candle_list[i]['close_price']
+            tot += close_price
             n += 1
             
         return (tot / n)
 
 
-    def get_stdev(start=-1, end=-1):
+    def get_std(self, start=-1, end=-1):
         start = 0 if start == -1 else start
         end = len(self.candle_list) if end == -1 else end
         
         n = 0
         tot = 0.0
-        avg = self.get_average(start, end)
+        avg = self.get_avg(start, end)
 
         for i in range(start, end):
-            close = self.candle_list[i]['closing_price']
-            tot += (close - avg)**2
+            close_price = self.candle_list[i]['close_price']
+            tot += (close_price - avg)**2
             n += 1
 
         return (tot / n)**0.5
@@ -96,8 +98,8 @@ class Candles(object):
             if current_vidya == -1:
                 current_vidya = close_price
             else:
-                current_vidya = close_price * current_factor 
-                                + current_vidya * (1-current_factor)
+                current_vidya = close_price * current_factor \
+                                + current_vidya * (1 - current_factor)
 
             vidya_list.append(current_vidya)
         

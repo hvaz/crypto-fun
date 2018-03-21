@@ -33,5 +33,6 @@ info_exchanges = { \
 strategies = [ \
     "ema", \
     "stat", \
-    "sandbox" \
+    "sandbox", \
+    "hold", \
 ]

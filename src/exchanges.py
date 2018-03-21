@@ -3,10 +3,9 @@ import json
 from datetime import datetime
 
 from markets import Market
-from candles import Candles
+from candles import Candles, NUM_CANDLES
 from utils import active_internet, str_to_dict
 
-NUM_CANDLES = 1000
 
 class Exchange(object):
     def __init__(self, info):
@@ -74,6 +73,7 @@ class Exchange(object):
             raise 'Cannot get candles for this exchange yet. Please update code'
 
         return {'url': url, 'payload': payload}
+
 
     def _get_offline_candles(self, filename):
         try:
