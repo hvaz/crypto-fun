@@ -1,29 +1,32 @@
 import time
 from traders import ExchangeTrader
 
-hitbtc2 = ExchangeTrader("hitbtc2")
+def test_trader_pipeline():
 
-print "Making orders..."
-hitbtc2.buy("ETH/BTC", 0.001, 0.00059498)
-hitbtc2.sell("ETH/BTC", 0.001, 0.1)
+    hitbtc2 = ExchangeTrader("hitbtc2")
 
-time.sleep(5)
+    try:
+        hitbtc2.buy("ETH/BTC", 0.001, 0.00059498)
+        hitbtc2.sell("ETH/BTC", 0.001, 0.1)
+    except Exception as e:
+        raise e
 
-print "\nRetrieving orders' status..."
-for order in hitbtc2.orders:
-    print order
-    print 'order status = {}'.format(hitbtc2.order_status(order['id']))
+    time.sleep(5)
 
-time.sleep(5)
+    for order in hitbtc2.orders:
+        order_status = hitbtc2.order_status(order['id'])
+        assert(order_status == 'open')
 
-print "\nCanceling orders..."
-for order in hitbtc2.orders:
-    print order
-    hitbtc2.cancel_order(order['id'])
+    time.sleep(5)
 
-time.sleep(5)
+    for order in hitbtc2.orders:
+        hitbtc2.cancel_order(order['id'])
 
-print "\nRetrieving orders' status again..."
-for order in hitbtc2.orders:
-    print order
-    print 'order status = {}'.format(hitbtc2.order_status(order['id']))
+    time.sleep(5)
+
+    for order in hitbtc2.orders:
+        order_status = hitbtc2.order_status(order['id'])
+        assert(order_status == 'canceled')
+
+
+test_trader_pipeline()
