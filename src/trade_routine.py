@@ -14,19 +14,17 @@ def test_trader_pipeline():
     time.sleep(5)
 
     for order in hitbtc2.orders:
-        order_status = hitbtc2.order_status(order['id'])
-        assert(order_status == 'open')
+        assert(order.status() == 'open')
 
     time.sleep(5)
 
     for order in hitbtc2.orders:
-        hitbtc2.cancel_order(order['id'])
+        order.cancel()
 
     time.sleep(5)
 
     for order in hitbtc2.orders:
-        order_status = hitbtc2.order_status(order['id'])
-        assert(order_status == 'canceled')
+        assert(order.status() == 'canceled')
 
 
 test_trader_pipeline()
