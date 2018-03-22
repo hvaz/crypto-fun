@@ -132,7 +132,7 @@ class Exchange(object):
         return possible_intervals[size]
 
 
-    def update_candles(self, mkt_name, size, unit):
+    def update_candles(self, mkt_name, size, unit, amount=NUM_CANDLES):
         
         interval = self.format_interval(size, unit)
 
@@ -140,5 +140,5 @@ class Exchange(object):
             raise "Invalid mkt_name parameter for get_candles"
         
         mkt = self.markets[mkt_name]
-        candles_data = self._get_candles_data(mkt_name, interval, NUM_CANDLES)
+        candles_data = self._get_candles_data(mkt_name, interval, amount)
         mkt.candles[interval] = Candles(interval, candles_data)
