@@ -37,10 +37,10 @@ class ExchangeTrader(Exchange):
                     response = self.exchange.create_market_sell_order(mkt_symbol, amount)
             
             order = Order(self.exchange, response['id'])
+            self.orders.append(order)
         except Exception as e:
             raise e
         else:
-            self.orders.append(order)
             return order.id
 
 
