@@ -27,7 +27,6 @@ class MoneyMaker(ExchangeTrader):
         # when the order is filled or canceled, it continues to the next cycle
         while True:
 
-            candles_list = self.markets[mkt_symbol].get_candles(interval, start)
             candles_obj = self.markets[mkt_symbol].candles
             avg = candles_obj.get_avg(start)
             stdev = candles_obj.get_std(start)
