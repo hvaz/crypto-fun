@@ -12,14 +12,17 @@ def test_trader_pipeline():
         raise e
 
     time.sleep(5)
-
+    
     for order in hitbtc2.orders:
         assert(order.status() == 'open')
 
     time.sleep(5)
 
+    num_orders = len(hitbtc2.orders)
     for order in hitbtc2.orders:
         order.cancel()
+        num_orders -= 1
+        assert(len(hitbtc2.orders) == num_orders)
 
     time.sleep(5)
 

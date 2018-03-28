@@ -1,24 +1,38 @@
 import random
+import ccxt
+from collections import defaultdict
+from exchanges import ccxtExchange
+from candles import MarketCandles
 from printing import print_comparing_hold
 
 class Market(object):
 
-    def __init__(self, name, exchange_name, percentage_fee, intervals):
+    def __init__(self, symbol, ccxt_exchange):
         
-        self.name = name
-        self.exchange_name = exchange_name
-        self.fee = percentage_fee
-        self.candles = {}
+        self.symbol = symbol
+        self.ccxt_exchange = ccxt_exchange
+        self.taker_fee = ccxt_exchange.ccxt_obj.market(symbol)['taker']
+        self.maker_fee = ccxt_exchange.ccxt_obj.market(symbol)['maker']
+        self.candles = defaultdict(lambda: None)
         
-        for _, unit_dict in intervals.iteritems():
-            for size in unit_dict:
-                self.candles[unit_dict[size]] = None
+
+    def get_candles(self, interval, start=None, end=None):
+        
+        ## IF PROGRAM IS RUNNING FOREVER, THE LIST OF MARKET CANDLES DOES NOT UPDATE
+        ## AS TIME GOES BY
+
+        if self.candles[interval] == None:
+            self.candles[interval] = MarketCandles(self.ccxt_exchange, self.symbol, interval)
+        
+        start = 0 if start == None else start
+        end = len(self.candles[interval].candle_list) if end == None else end
+
+        return self.candles[interval].candle_list[start:end]
 
 
     def test_ema_model(self, candle_object, start, end, short_factor, long_factor, threshold):
         
-        ## adjust fee to be between 0 and 1 since it is given as percentage
-        fee = self.fee / 100
+        fee = self.taker_fee
         c_list = candle_object.candle_list
         short_ema_list = candle_object.get_ema_list(short_factor)
         long_ema_list = candle_object.get_ema_list(long_factor)
@@ -52,7 +66,7 @@ class Market(object):
     # in general buy_th is negative and sell_th is positive
     def test_stat_model(self, candle_object, start, end, buy_th, sell_th, calib_proportion, updating=True):
         
-        fee = self.fee / 100
+        fee = self.maker_fee
         end_calib = int(start + (end - start) * calib_proportion)
         c_list = candle_object.candle_list
         
@@ -115,7 +129,7 @@ class Market(object):
     def test_hold_model(self, candle_object, start, end, calib_proportion):
         
         candle_list = candle_object.candle_list
-        fee = self.fee / 100
+        fee = self.taker_fee
         total_c1 = 1.0
         total_c2 = 0.0
 
@@ -140,8 +154,8 @@ class Market(object):
         hold_profit = self.test_hold_model(candle_object, start, end, calib_proportion)
         
         print "\n" + "." * 100 + "\n"
-        print "Exchange: {}".format(self.exchange_name)
-        print "Market: {}\n".format(self.name)
+        print "Exchange: {}".format(self.ccxt_exchange.ccxt_obj.id)
+        print "Market: {}\n".format(self.symbol)
         print "Hold profit:", hold_profit
         print "Avg = {} ....... Std = {}\n".format(candle_object.get_avg(start, end), \
                                                  candle_object.get_std(start, end))
@@ -160,12 +174,13 @@ class Market(object):
                 
                 print_comparing_hold(str(results), results["profit"], hold_profit)
 
+
     def test_sandbox_model(self, candle_object, params):
         
         start, end, buy_th, sell_th = int(params[0]), int(params[1]), float(params[2]), float(params[3])
         calib_proportion = float(params[4])
 
-        fee = self.fee / 100
+        fee = self.maker_fee
         end_calib = int(start + (end - start) * calib_proportion)
         c_list = candle_object.candle_list
 

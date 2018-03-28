@@ -1,8 +1,9 @@
-from exchanges import Exchange
-from infos import info_exchanges, strategies
+import logging
+from collections import defaultdict
+from markets import Market
+from exchanges import ccxtExchange
 from parser import set_parser, handle_args
 from printing import print_comparing_hold, print_env_info, print_model_results
-import logging
 
 
 def apply_model(strategy, args, mkt, interval):
@@ -27,8 +28,8 @@ def apply_model(strategy, args, mkt, interval):
         elif strategy == "sandbox":
             mkt_strategy_profit = mkt.test_sandbox_model(cur_candles, args["sandbox_params"])
 
-    except Exception as e:
-        raise e
+    except:
+        raise
 
     else:
         return mkt_strategy_profit
@@ -36,18 +37,15 @@ def apply_model(strategy, args, mkt, interval):
 
 def start_testing(args):
     ## instantiate exchanges, update candles, and run strategy
-    profits = {}
-    exchange_objs = []
+    profits = defaultdict(dict)
     for x in args["exchanges"]:
-        exchange_info = info_exchanges[x]
-        new_exchange = Exchange(exchange_info)
-        exchange_objs.append(new_exchange)
-        profits[x] = {}
+        new_exchange = ccxtExchange(x)
         exchange_profits = profits[x]
 
         for m in args["markets"][x]:
-            new_exchange.update_candles(m, args["candles_m_size"], args["candles_m_unit"])
-            interval = new_exchange.format_interval(args["candles_m_size"], args["candles_m_unit"])
+            new_exchange.markets[m] = Market(m, new_exchange)
+            interval = new_exchange.get_ccxt_candles_interval_format(args["candles_m_size"], args["candles_m_unit"])
+            new_exchange.get_market_candles(m, interval)
             mkt = new_exchange.markets[m]
             
             exchange_profits[m] = {}

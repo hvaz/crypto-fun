@@ -1,21 +1,22 @@
+import ccxt
 import argparse
-from infos import info_exchanges, strategies
+from infos import strategies, candle_units
 
 
 def set_parser():
     parser = argparse.ArgumentParser(description="Executing trading strategies for different crypto exchanges")
 
-    parser.add_argument("--exchanges", metavar="EXCHANGES", type=str, nargs="+", \
+    parser.add_argument("--exchanges", metavar="EXCHANGES", type=str, nargs="+", default=['hitbtc2', 'binance'], \
             help="List of exchanges to be used. Default value is list of all exchanges")
 
-    parser.add_argument("--markets", metavar="MARKETS", type=str, nargs="+", \
+    parser.add_argument("--markets", metavar="MARKETS", type=str, nargs="+", default=['ETH/BTC', 'TRX/BTC'], \
             help="List of market's symbols in which to test model. Default covers all defined markets for each exchange")
 
     parser.add_argument("--candles_m_size", metavar="CANDLES_M_SIZE", type=int, nargs=1, default=3, \
             help="Candles m parameter's size used to determine their chronological extension. Check infos.py file for options. Default value is 3")
 
     parser.add_argument("--candles_m_unit", metavar="CANDLES_M_UNIT", type=str, nargs=1, default="minute", \
-            help="Candles m parameter's unit used to determine their chronological extension: Check infos.py file for options. Default value is minute")
+            choices=candle_units.keys(), help="Candles m parameter's unit used to determine their chronological extension: Check infos.py file for options. Default value is minute")
 
     parser.add_argument("--strategy", metavar="STRATEGY", type=str, nargs=1, choices=strategies, required=True,\
             help="Strategy to be tested")
@@ -56,9 +57,7 @@ def set_parser():
 def format_args(args):
     for a in args:
         if a == "exchanges":
-            args[a] = info_exchanges.keys() if args["exchanges"] == None \
-                      else [x.lower() for x in args["exchanges"]]
-
+            args[a] = [x.lower() for x in args["exchanges"]]
                               
         elif a != "markets":
             val = args[a]
@@ -72,19 +71,16 @@ def format_args(args):
 
     ## format markets argument
     mkts_list = None if args["markets"] == None else [m.upper() for m in args["markets"]]
-    args["markets"] = {x: mkts_list if mkts_list != None else info_exchanges[x]["symbols"] \
-                       for x in args["exchanges"]}
+    args["markets"] = {x: mkts_list for x in args["exchanges"]}
+
 
 def check_args(args):
-    for e in ["exchanges", "markets"]:
-        assert(e in args.keys()), "Invalid set of arguments. It does not the contain element '{}'".format(e)
-
     for x in args["exchanges"]:
-        exchange = info_exchanges[x]
-        for m in args["markets"][x]:
-            assert(m in exchange["symbols"]), "'{}' market not yet supported by exchange '{}' in our system. Please try again.".format(m, x)
+        if x not in ccxt.exchanges:
+            msg = "{} exchange is not supported. Please check ccxt.exchanges for supported exchanges".format(x)
+            raise Exception(msg)
 
 
 def handle_args(args):
     format_args(args)
-    check_args(args)
+    check_args
