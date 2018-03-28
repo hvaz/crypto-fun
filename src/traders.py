@@ -1,19 +1,21 @@
 import ccxt
 from keys import keys
-from exchanges import Exchange
+from exchanges import ccxtExchange
 from orders import Order
 
 class ExchangeTrader(ccxtExchange):
 
-    def __init__(self):
+    def __init__(self, exchange_name):
         try:
-            exchange_id = self.ccxt_exchange.id
-            self.ccxt_exchange.apiKey = keys[exchange_id]['apiKey'],
-            self.ccxt_exchange.secret = keys[exchange_id]['secret']
-        except Exception as e:
-            raise e
+            super(ExchangeTrader, self).__init__(exchange_name)
+            exchange_id = self.ccxt_obj.id
+            self.ccxt_obj.apiKey = keys[exchange_id]['apiKey']
+            self.ccxt_obj.secret = keys[exchange_id]['secret']
+        except:
+            raise
         else:
-            self.orders = []
+            self.orders_alive = []
+            self.orders_history = []
 
 
     def _make_order(self, mkt_symbol, quantity, price=None, side='buy', order_type='limit'):
@@ -25,20 +27,21 @@ class ExchangeTrader(ccxtExchange):
         try:
             if order_type == 'limit':
                 if side == 'buy':
-                    response = self.ccxt_exchange.create_limit_buy_order(mkt_symbol, quantity, price)
+                    response = self.ccxt_obj.create_limit_buy_order(mkt_symbol, quantity, price)
                 else:
-                    response = self.ccxt_exchange.create_limit_sell_order(mkt_symbol, quantity, price)
+                    response = self.ccxt_obj.create_limit_sell_order(mkt_symbol, quantity, price)
 
             else:
                 if side == 'buy':
-                    response = self.ccxt_exchange.create_market_buy_order(mkt_symbol, quantity)
+                    response = self.ccxt_obj.create_market_buy_order(mkt_symbol, quantity)
                 else:
-                    response = self.ccxt_exchange.create_market_sell_order(mkt_symbol, quantity)
+                    response = self.ccxt_obj.create_market_sell_order(mkt_symbol, quantity)
             
             order = Order(self, response['id'])
-            self.orders.append(order)
-        except Exception as e:
-            raise e
+            self.orders_alive.append(order)
+            self.orders_history.append(order)
+        except:
+            raise
         else:
             return order.id
 
@@ -57,8 +60,8 @@ class ExchangeTrader(ccxtExchange):
             self._make_order(mkt_symbol, quantity, price, side='sell', order_type='market')
 
 
-    def remove_order(self, order_id):
+    def kill_order(self, order):
         try:
-            self.orders.remove(order_id)
-        except Exception as e:
-            raise e
+            self.orders_alive.remove(order)
+        except:
+            raise

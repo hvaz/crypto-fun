@@ -4,7 +4,6 @@ class Order(object):
 
     def __init__(self, exchange_trader, order_id):
         self.owner = exchange_trader
-        self.ccxt_exchange = exchange_trader.ccxt_exchange
         self.id = order_id
 
 
@@ -17,8 +16,8 @@ class Order(object):
             Return Value: https://github.com/ccxt/ccxt/wiki/Manual#exceptions-on-order-canceling
         '''
         try:
-            self.ccxt_exchange.cancel_order(self.id)
-            self.owner.remove_order(self.id)
+            self.owner.ccxt_obj.cancel_order(self.id)
+            self.owner.kill_order(self)
         except Exception as e:
             print e
 
@@ -32,8 +31,8 @@ class Order(object):
 
             Return Value: dictionary as specified in https://github.com/ccxt/ccxt/wiki/Manual#order-structure
         '''
-        if self.exchange.has['fetchOrder']:
-            order = self.ccxt_exchange.fetch_order(self.id)
+        if self.owner.ccxt_obj.has['fetchOrder']:
+            order = self.owner.ccxt_obj.fetch_order(self.id)
             return order
         else:
             return None
