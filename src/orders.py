@@ -55,7 +55,7 @@ class Order(object):
             return status
 
 
-    def is_order_filled(self):
+    def is_filled(self):
 
         if self.status() == 'closed':
             return True

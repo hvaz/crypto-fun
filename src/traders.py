@@ -43,7 +43,7 @@ class ExchangeTrader(ccxtExchange):
         except:
             raise
         else:
-            return order.id
+            return order
 
 
     def buy(self, mkt_symbol, quantity, price=None, limit=True):
