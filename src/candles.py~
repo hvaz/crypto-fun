@@ -123,7 +123,8 @@ class MarketCandles(object):
             if current_vidya == -1:
                 current_vidya = close_price
             else:
-                current_vidya = close_price * current_factor+ current_vidya * (1 - current_factor)
+                current_vidya = close_price * current_factor \
+                                + current_vidya * (1 - current_factor)
 
             vidya_list.append(current_vidya)
         

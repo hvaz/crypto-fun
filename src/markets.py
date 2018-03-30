@@ -62,6 +62,39 @@ class Market(object):
         profits = total_c1 - 1.0
         return profits
 
+
+    def test_vidya_model(self, candle_object, start, end, short_factor, long_factor, threshold):
+
+        fee = self.taker_fee
+        c_list = candle_object.candle_list
+        short_ema_list = candle_object.get_vidya_list(short_factor)
+        long_ema_list = candle_object.get_vidya_list(long_factor)
+
+        # the market is c2/c1                                                                                   
+        total_c1 = 1.0
+        total_c2 = 0.0
+        side = 'c1'
+
+        for i in range(start, end):
+            close = float(c_list[i]['close_price'])
+
+            if (short_ema_list[i] > (long_ema_list[i] * (1 + threshold)) and side == 'c1'):
+                total_c2 = (1 - fee) * total_c1 / close
+                total_c1 = 0
+                side = 'c2'
+
+            if (short_ema_list[i] < (long_ema_list[i] * (1 - threshold)) and side == 'c2'):
+                total_c1 = (1 - fee) * total_c2 * close
+                total_c2 = 0
+                side = 'c1'
+
+        if side == 'c2':
+            total_c1 = (1 - fee) * total_c2 * close
+            total_c2 = 0
+
+        profits = total_c1 - 1.0
+        return profits
+
     # buy_th and sell_th are thresholds given in number of stdev
     # in general buy_th is negative and sell_th is positive
     def test_stat_model(self, candle_object, start, end, buy_th, sell_th, calib_proportion, updating=True):
@@ -179,7 +212,9 @@ class Market(object):
         
         start, end = int(params[0]), int(params[1])
 
-        return self.optimize_then_stat(candle_object, start, end)[0]
+        short_factor, long_factor, threshold = float(params[2]), float(params[3]), float(params[4])
+
+        return self.test_vidya_model(candle_object, start, end, short_factor, long_factor, threshold)
 
 
 
