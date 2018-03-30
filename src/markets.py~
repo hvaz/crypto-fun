@@ -177,11 +177,69 @@ class Market(object):
 
     def test_sandbox_model(self, candle_object, params):
         
-        start, end = int(params[0]), int(params[1])
+        start, end, buy_th, sell_th = int(params[0]), int(params[1]), float(params[2]), float(params[3])
+        calib_proportion = float(params[4])
 
-        return self.optimize_then_stat(candle_object, start, end)[0]
+        fee = self.maker_fee
+        end_calib = int(start + (end - start) * calib_proportion)
+        c_list = candle_object.candle_list
+
+        if end-start < 8:
+            return 0
+
+        if end_calib - start < 4:
+            end_calib = min(end, start+4)
+
+        tot = 0
+        n = 0
+        for i in range(start, end_calib):
+            close = float(c_list[i]['close_price'])
+            tot += close
+            n += 1
 
 
+        avg = tot / n
+        tot = 0
+        for i in range(start, end_calib):
+            close = float(c_list[i]['close_price'])
+            tot += (close - avg)**2
+
+        stdev = (tot / (n - 1))**0.5
+
+        # the market is c1/c2                                                                            
+        total_c1 = 1.0
+        total_c2 = 0
+        side = 'c1'
+        buy_count = 0
+        sell_count = 0
+
+        for i in range(end_calib, end - 1):
+            close = float(c_list[i + 1]['close_price'])
+
+            if (close < (avg + stdev * buy_th) and side == 'c1'):
+                total_c2 = (1 - fee) * total_c1 / close
+                total_c1 = 0
+                buy_count += 1
+                side = 'c2'
+
+            if (close > (avg + stdev * sell_th) and side == 'c2'):
+                total_c1 = (1 - fee) * total_c2 * close
+                total_c2 = 0
+                sell_count += 1
+                side = 'c1'
+
+            if (updating):
+                avg = (avg * n + close) / (n + 1)
+                stdev = (((stdev**2) * (n - 1) + (close - avg)**2) / n)**0.5
+                n += 1
+
+
+        if side == 'c2':
+            total_c1 = (1 - fee) * total_c2 * close
+            total_c2 = 0
+
+        profits = total_c1 - 1.0
+        return profits
 
     def avg_and_stdev(self, candle_object, start, end):
 
