@@ -207,6 +207,60 @@ class Market(object):
                 
                 print_comparing_hold(str(results), results["profit"], hold_profit)
 
+    def weighted_stats(self, candle_object, start, end, buy_th, sell_th, calib_proportion, updating):
+
+        fee = self.fee / 100
+        end_calib = int(start + (end - start) * calib_proportion)
+        test_size = end_calib - start
+        c_list = candle_object.candle_list
+
+        if end-start < 8:
+            return 0
+
+        if end_calib - start < 4:
+            end_calib = min(end, start+4)
+
+        n = test_size
+        hh = candle_object.weighted_avg_and_stdev(n-test_size, n)
+        avg = hh[0]
+        stdev = hh[1]
+
+        # the market is c1/c2                                                                                          
+        total_c1 = 1.0
+        total_c2 = 0
+        side = 'c1'
+        buy_count = 0
+        sell_count = 0
+
+        for i in range(end_calib, end - 1):
+            close = float(c_list[i + 1]['close_price'])
+
+            if (close < (avg + stdev * buy_th) and side == 'c1'):
+                total_c2 = (1 - fee) * total_c1 / close
+                total_c1 = 0
+                buy_count += 1
+                side = 'c2'
+
+            if (close > (avg + stdev * sell_th) and side == 'c2'):
+                total_c1 = (1 - fee) * total_c2 * close
+                total_c2 = 0
+                sell_count += 1
+                side = 'c1'
+
+            if (updating):
+                hh = candle_object.weighted_avg_and_stdev(n-test_size, n)
+                avg = hh[0]
+                stdev = hh[1]
+                n += 1
+
+        if side == 'c2':
+            total_c1 = (1 - fee) * total_c2 * close
+            total_c2 = 0
+
+        profits = total_c1 - 1.0
+        return profits
+
+
 
     def test_sandbox_model(self, candle_object, params):
         
@@ -215,57 +269,6 @@ class Market(object):
         short_factor, long_factor, threshold = float(params[2]), float(params[3]), float(params[4])
 
         return self.test_vidya_model(candle_object, start, end, short_factor, long_factor, threshold)
-
-
-
-    def avg_and_stdev(self, candle_object, start, end):
-
-        c_list = candle_object.candle_list
-
-        tot = 0
-        n = 0
-        for i in range(start, end):
-            close = float(c_list[i]['close_price'])
-            tot += close
-            n += 1
-
-        avg = tot / n
-        tot = 0
-        for i in range(start, end):
-            close = float(c_list[i]['close_price'])
-            tot += (close - avg)**2
-
-        stdev = (tot / (n - 1))**0.5
-
-        return (avg, stdev)
-
-
-    def weighted_avg_and_stdev(self, candle_object, start, end):
-
-        c_list = candle_object.candle_list
-
-        tot = 0
-        tot_volume = 0
-        n = 0
-        for i in range(start, end):
-            close = float(c_list[i]['close_price'])
-            vol = float(c_list[i]['volume'])
-            tot += close * vol
-            tot_volume += vol
-            n += 1
-
-        avg = tot / tot_volume
-
-        tot = 0
-
-        for i in range(start, end):
-            close = float(c_list[i]['close_price'])
-            vol = float(c_list[i]['volume'])
-            tot += vol * (close - avg)**2
-
-        stdev = (tot / tot_volume)**0.5
-
-        return (avg, stdev)
 
 
     def optimize_stats(self, candle_object, start, end):

@@ -92,6 +92,42 @@ class MarketCandles(object):
         return (tot / n)**0.5
 
 
+    def avg_and_stdev(self, start, end):
+
+        avg = self.get_avg(start, end)
+        stdev = self.get_stdv(start, end)
+        return (avg, stdev)
+
+
+    def weighted_avg_and_stdev(self, start, end):
+
+        c_list = candle_object.candle_list
+
+        tot = 0
+        tot_volume = 0
+        n = 0
+        for i in range(start, end):
+            close = float(c_list[i]['close_price'])
+            vol = float(c_list[i]['volume'])
+            tot += close * vol
+            tot_volume += vol
+            n += 1
+
+        avg = tot / tot_volume
+
+        tot = 0
+
+        for i in range(start, end):
+            close = float(c_list[i]['close_price'])
+            vol = float(c_list[i]['volume'])
+            tot += vol * (close - avg)**2
+
+        stdev = (tot / tot_volume)**0.5
+
+        return (avg, stdev)
+
+
+
     # assumes data is in ascending time
     def get_ema_list(self, factor):
         ema_list = []
