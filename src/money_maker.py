@@ -1,4 +1,4 @@
-from exchanges import ExchangeTrader
+from ccxt_exchanges import ExchangeTrader
 import time
 
 class MoneyMaker(ExchangeTrader):

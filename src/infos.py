@@ -1,4 +1,4 @@
-strategies = [
+valid_strategies = [
     "ema",
     "stat",
     "sandbox",

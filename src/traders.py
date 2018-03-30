@@ -1,6 +1,6 @@
 import ccxt
 from keys import keys
-from exchanges import ccxtExchange
+from ccxt_exchanges import ccxtExchange
 from orders import Order
 
 class ExchangeTrader(ccxtExchange):

@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict
 from markets import Market
-from exchanges import ccxtExchange
+from ccxt_exchanges import ccxtExchange
 from parser import set_parser, handle_args
 from printing import print_comparing_hold, print_env_info, print_model_results
 

@@ -1,33 +1,54 @@
-import random
-import ccxt
-from collections import defaultdict
-from exchanges import ccxtExchange
-from candles import MarketCandles
-from printing import print_comparing_hold
+from ccxt_exchanges import ccxtExchange
+from infos import valid_strategies
 
-class Market(object):
+class TestManager(ccxtExchange):
 
-    def __init__(self, symbol, ccxt_exchange):
+    def __init__(self, portfolio, strategy, candles_magnitude):
+
+        if strategy not in valid_strategies and strategy != "sandbox":
+            return None
         
-        self.symbol = symbol
-        self.ccxt_exchange = ccxt_exchange
-        self.taker_fee = ccxt_exchange.ccxt_obj.market(symbol)['taker']
-        self.maker_fee = ccxt_exchange.ccxt_obj.market(symbol)['maker']
-        self.candles = defaultdict(lambda: None)
-        
+        ## List of market objects in this portfolio, all in the same exchange
+        self.portfolio = portfolio
+        ## Strategy to be followed by manager
+        self.strategy = strategy
+        ## Magnitute of candles (1 minute, 3 minutes, 1 day, etc)
+        self.candles_magnitude = candles_magnitude
+    
 
-    def get_candles(self, interval, start=None, end=None):
+    def apply_model_to_portfolio(self, params)
         
-        ## IF PROGRAM IS RUNNING FOREVER, THE LIST OF MARKET CANDLES DOES NOT UPDATE
-        ## AS TIME GOES BY
+        profits = {}
+        for mkt_obj in portolio:
+            mkt_candles_obj = mkt_obj.get_candles(candles_magnitude)
+            profit = self.apply_model_once(mkt_candles_obj, params)
+            profits[mkt_obj] = profit
 
-        if self.candles[interval] == None:
-            self.candles[interval] = MarketCandles(self.ccxt_exchange, self.symbol, interval)
+        return profits
+
+
+    def apply_model_once(self, mkt_candles_obj, params):
         
-        start = 0 if start == None else start
-        end = len(self.candles[interval].candle_list) if end == None else end
+        start, end = params["start"], params["end"]
+        if strategy == "ema":
+            short_factor, long_factor = params["short_factor"], params["long_factor"]
+            threshold = params["threshold"]
+            return self.test_ema_model(mkt_candles_obj, start, end, short_factor, long_factor, threshold)
 
-        return self.candles[interval].candle_list[start:end]
+        elif strategy == "stat":
+            buy_th, sell_th = params["buy_th"], params["sell_th"]
+            calib_proportion = params["calib_proportion"]
+            updating = params["updating"]
+            return self.test_stat_model(mkt_candles_obj, start, end, buy_th, sell_th, calib_proportion, updating)
+
+        elif strategy == "hold":
+            calib_proportion = params["calib_proportion"]
+            return self.test_hold_model(mkt_candles_obj, start, end, calib_proportion)
+
+        else:
+            return "Invalid strategy in models_manager"
+
+
 
 
     def test_ema_model(self, candle_object, start, end, short_factor, long_factor, threshold):
@@ -214,7 +235,7 @@ class Market(object):
 
         short_factor, long_factor, threshold = float(params[2]), float(params[3]), float(params[4])
 
-        return self.test_vidya_model(start, end, short_factor, long_factor, threshold)
+        return self.test_vidya_model(candle_object, start, end, short_factor, long_factor, threshold)
 
 
 
