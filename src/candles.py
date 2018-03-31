@@ -100,8 +100,6 @@ class MarketCandles(object):
 
 
     def avg_and_stdev(self, start=None, end=None):
-        start = 0 if start == None else start
-        end = len(self.candle_list) if end == None else end
 
         avg = self.get_avg(start, end)
         stdev = self.get_stdv(start, end)
