@@ -15,10 +15,9 @@ class ccxtExchange(object):
             self.markets = defaultdict()
     
     
-    def get_ccxt_candles_interval_format(self, size, unit):
-        key = str(size) + candle_units[unit]
-        return key
-        #return self.ccxt_obj.timeframes[key]
+    def get_ccxt_candles_magnitude_format(self, size, unit):
+        candles_magnitude = str(size) + candle_units[unit]
+        return candles_magnitude
 
 
     def get_market_candles(self, mkt_symbol, interval, start=None, end=None):

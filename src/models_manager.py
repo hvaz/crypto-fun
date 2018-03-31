@@ -1,77 +1,85 @@
+import random
 from ccxt_exchanges import ccxtExchange
+from printing import print_comparing_hold
 from infos import valid_strategies
 
 class TestManager(ccxtExchange):
 
-    def __init__(self, portfolio, strategy, candles_magnitude):
+    def __init__(self, exchange_name, portfolio, candles_magnitude, strategy):
+        try:
+            super(TestManager, self).__init__(exchange_name)
+        except:
+            raise
 
-        if strategy not in valid_strategies and strategy != "sandbox":
-            return None
-        
-        ## List of market objects in this portfolio, all in the same exchange
-        self.portfolio = portfolio
-        ## Strategy to be followed by manager
-        self.strategy = strategy
-        ## Magnitute of candles (1 minute, 3 minutes, 1 day, etc)
-        self.candles_magnitude = candles_magnitude
+        else:
+            ## List of market objects in this portfolio, all in the same exchange
+            self.portfolio = portfolio
+            ## Strategy to be followed by manager
+            self.strategy = strategy
+            ## Magnitute of candles (1 minute, 3 minutes, 1 day, etc)
+            self.candles_magnitude = candles_magnitude
     
 
-    def apply_model_to_portfolio(self, params)
-        
+    def apply_model_to_portfolio(self, params): 
         profits = {}
-        for mkt_obj in portolio:
-            mkt_candles_obj = mkt_obj.get_candles(candles_magnitude)
-            profit = self.apply_model_once(mkt_candles_obj, params)
+        for mkt_obj in self.portfolio:
+            profit = self.apply_model_once(mkt_obj, params)
             profits[mkt_obj] = profit
 
         return profits
 
 
-    def apply_model_once(self, mkt_candles_obj, params):
+    def apply_model_once(self, mkt_obj, params):
         
-        start, end = params["start"], params["end"]
-        if strategy == "ema":
+        try:
+            start, end = params["start"], params["end"]
+        except:
+            start, end = None, None
+
+        if self.strategy == "ema":
             short_factor, long_factor = params["short_factor"], params["long_factor"]
             threshold = params["threshold"]
-            return self.test_ema_model(mkt_candles_obj, start, end, short_factor, long_factor, threshold)
+            return self.test_ema_model(mkt_obj, start, end, short_factor, long_factor, threshold)
 
-        elif strategy == "stat":
-            buy_th, sell_th = params["buy_th"], params["sell_th"]
+        elif self.strategy == "stat":
+            buy_th, sell_th = params["stat_buy_th"], params["stat_sell_th"]
             calib_proportion = params["calib_proportion"]
-            updating = params["updating"]
-            return self.test_stat_model(mkt_candles_obj, start, end, buy_th, sell_th, calib_proportion, updating)
+            updating = params["updating_stat"]
+            return self.test_stat_model(mkt_obj, start, end, buy_th, sell_th, calib_proportion, updating)
 
-        elif strategy == "hold":
+        elif self.strategy == "hold":
             calib_proportion = params["calib_proportion"]
-            return self.test_hold_model(mkt_candles_obj, start, end, calib_proportion)
+            return self.test_hold_model(mkt_obj, start, end, calib_proportion)
+
+        elif self.strategy == "study_stats":
+            calib_proportion = params["calib_proportion"]
+            updating = params["updating_stat"]
+            return self.study_stats(mkt_obj, start, end, calib_proportion, updating)
 
         else:
-            return "Invalid strategy in models_manager"
+            raise ValueError("{}: Invalid strategy in models_manager.py".format(self.strategy))
 
 
-
-
-    def test_ema_model(self, candle_object, start, end, short_factor, long_factor, threshold):
-        
-        fee = self.taker_fee
-        c_list = candle_object.candle_list
-        short_ema_list = candle_object.get_ema_list(short_factor)
-        long_ema_list = candle_object.get_ema_list(long_factor)
+    def test_ema_model(self, mkt_obj, start, end, short_factor, long_factor, threshold):
+        fee = mkt_obj.taker_fee
+        c_list = mkt_obj.get_candles(self.candles_magnitude, start, end)
+        short_ema_list = mkt_obj.candles[self.candles_magnitude].get_ema_list(short_factor, start, end)
+        long_ema_list = mkt_obj.candles[self.candles_magnitude].get_ema_list(long_factor, start, end)
 
         # the market is c2/c1                                                                    
         total_c1 = 1.0
         total_c2 = 0.0
         side = 'c1'
 
-        for i in range(start, end):
-            close = float(c_list[i]['close_price'])
+        for c, short_ema, long_ema in zip(c_list, short_ema_list, long_ema_list):
+            close = float(c['close_price'])
 
-            if (short_ema_list[i] > (long_ema_list[i] * (1 + threshold)) and side == 'c1'):
+            if (short_ema > (long_ema * (1 + threshold)) and side == 'c1'):
                 total_c2 = (1 - fee) * total_c1 / close
                 total_c1 = 0
                 side = 'c2'
 
-            if (short_ema_list[i] < (long_ema_list[i] * (1 - threshold)) and side == 'c2'):
+            if (short_ema < (long_ema * (1 - threshold)) and side == 'c2'):
                 total_c1 = (1 - fee) * total_c2 * close
                 total_c2 = 0
                 side = 'c1'
@@ -84,27 +92,26 @@ class TestManager(ccxtExchange):
         return profits
 
 
-    def test_vidya_model(self, candle_object, start, end, short_factor, long_factor, threshold):
+    def test_vidya_model(self, mkt_obj, start, end, short_factor, long_factor, threshold):
+        fee = mkt_obj.taker_fee
+        c_list = mkt_obj.get_candles(self.candles_magnitude, start, end)
+        short_ema_list = mkt_obj.candles[self.candles_magnitude].get_ema_list(short_factor, start, end)
+        long_ema_list = mkt_obj.candles[self.candles_magnitude].get_ema_list(long_factor, start, end)
 
-        fee = self.taker_fee
-        c_list = candle_object.candle_list
-        short_ema_list = candle_object.get_vidya_list(short_factor)
-        long_ema_list = candle_object.get_vidya_list(long_factor)
-
-        # the market is c2/c1                                                                                   
+        # the market is c2/c1 
         total_c1 = 1.0
         total_c2 = 0.0
         side = 'c1'
 
-        for i in range(start, end):
-            close = float(c_list[i]['close_price'])
+        for c, short_ema, long_ema in zip(c_list, short_ema_list, long_ema_list):
+            close = float(c['close_price'])
 
-            if (short_ema_list[i] > (long_ema_list[i] * (1 + threshold)) and side == 'c1'):
+            if (short_ema > (long_ema * (1 + threshold)) and side == 'c1'):
                 total_c2 = (1 - fee) * total_c1 / close
                 total_c1 = 0
                 side = 'c2'
 
-            if (short_ema_list[i] < (long_ema_list[i] * (1 - threshold)) and side == 'c2'):
+            if (short_ema < (long_ema * (1 - threshold)) and side == 'c2'):
                 total_c1 = (1 - fee) * total_c2 * close
                 total_c2 = 0
                 side = 'c1'
@@ -116,13 +123,13 @@ class TestManager(ccxtExchange):
         profits = total_c1 - 1.0
         return profits
 
+
     # buy_th and sell_th are thresholds given in number of stdev
     # in general buy_th is negative and sell_th is positive
-    def test_stat_model(self, candle_object, start, end, buy_th, sell_th, calib_proportion, updating=True):
-        
-        fee = self.maker_fee
+    def test_stat_model(self, mkt_obj, start, end, buy_th, sell_th, calib_proportion, updating=True):
+        fee = mkt_obj.maker_fee
         end_calib = int(start + (end - start) * calib_proportion)
-        c_list = candle_object.candle_list
+        c_list = mkt_obj.get_candles(self.candles_magnitude, start, end_calib)
         
         if end-start < 8:
             return 0
@@ -132,15 +139,15 @@ class TestManager(ccxtExchange):
 
         tot = 0
         n = 0
-        for i in range(start, end_calib):
-            close = float(c_list[i]['close_price'])
+        for c in c_list:
+            close = float(c['close_price'])
             tot += close
             n += 1
 
         avg = tot / n
         tot = 0
-        for i in range(start, end_calib):
-            close = float(c_list[i]['close_price'])
+        for c in c_list:
+            close = float(c['close_price'])
             tot += (close - avg)**2
 
         stdev = (tot / (n - 1))**0.5
@@ -152,8 +159,9 @@ class TestManager(ccxtExchange):
         buy_count = 0
         sell_count = 0
 
-        for i in range(end_calib, end - 1):
-            close = float(c_list[i + 1]['close_price'])
+        c_list_after_end_calib = mkt_obj.get_candles(self.candles_magnitude, start=end_calib)
+        for c in c_list_after_end_calib:
+            close = float(c['close_price'])
 
             if (close < (avg + stdev * buy_th) and side == 'c1'):
                 total_c2 = (1 - fee) * total_c1 / close
@@ -180,20 +188,18 @@ class TestManager(ccxtExchange):
         return (profits, buy_count, sell_count)
 
 
-    def test_hold_model(self, candle_object, start, end, calib_proportion):
-        
-        candle_list = candle_object.candle_list
-        fee = self.taker_fee
+    def test_hold_model(self, mkt_obj, start, end, calib_proportion):
+        fee = mkt_obj.taker_fee
+        c_list = mkt_obj.get_candles(self.candles_magnitude, start, end)
         total_c1 = 1.0
         total_c2 = 0.0
-
         end_calib = int(start + calib_proportion * (end - start))
         
-        close_price = float(candle_list[end_calib]['close_price'])
+        close_price = float(mkt_obj.candles[self.candles_magnitude].get_candle(end_calib)['close_price'])
         total_c2 = (1 - fee) * total_c1 / close_price
         total_c1 = 0
 
-        close_price = float(candle_list[end]['close_price'])
+        close_price = float(mkt_obj.candles[self.candles_magnitude].get_candle(end)['close_price'])
         total_c1 = (1 - fee) * total_c2 * close_price
         total_c2 = 0
 
@@ -201,24 +207,27 @@ class TestManager(ccxtExchange):
         return profits
 
 
-    def study_stats(self, candle_object, start, end, calib_proportion, updating=True):
-        
+    def study_stats(self, mkt_obj, start, end, calib_proportion, updating=True): 
         lim = 1000
         mmax = -2
-        hold_profit = self.test_hold_model(candle_object, start, end, calib_proportion)
+        candle_obj = mkt_obj.candles[self.candles_magnitude]
+        hold_profit = self.test_hold_model(mkt_obj, start, end, calib_proportion)
         
         print "\n" + "." * 100 + "\n"
-        print "Exchange: {}".format(self.ccxt_exchange.ccxt_obj.id)
-        print "Market: {}\n".format(self.symbol)
-        print "Hold profit:", hold_profit
-        print "Avg = {} ....... Std = {}\n".format(candle_object.get_avg(start, end), \
-                                                 candle_object.get_std(start, end))
+        print "Exchange: {}".format(self.ccxt_obj.id)
+        print "Market: {}\n".format(mkt_obj.symbol)
+
+        info_hold_profit = "Hold profit: {}".format(hold_profit)
+        print_comparing_hold(info_hold_profit, hold_profit, hold_profit)
+
+        print "Avg = {} ....... Std = {}\n".format(candle_obj.get_avg(start, end), \
+                                                   candle_obj.get_std(start, end))
         
         for i in range(lim):
-            buy_th = -6*random.random()
-            sell_th = 6*random.random()
+            buy_th = -6 * random.random()
+            sell_th = 6 * random.random()
             profit, buy_count, sell_count = \
-                self.test_stat_model(candle_object, start, end, buy_th, sell_th, calib_proportion, updating)
+                self.test_stat_model(mkt_obj, start, end, buy_th, sell_th, calib_proportion, updating)
             if profit > mmax:
                 bestbuy = buy_th
                 bestsell = sell_th
@@ -229,92 +238,55 @@ class TestManager(ccxtExchange):
                 print_comparing_hold(str(results), results["profit"], hold_profit)
 
 
-    def test_sandbox_model(self, candle_object, params):
-        
-        start, end = int(params[0]), int(params[1])
+    def weighted_stats(self, mkt_obj, start, end, buy_th, sell_th, calib_proportion, updating):
+        fee = mkt_obj.maker_fee
+        end_calib = int(start + (end - start) * calib_proportion)
+        candle_obj = mkt_obj.candles[self.candles_magnitude]
+        test_size = end_calib - start
+        c_list = candle_obj.candle_list
 
-        short_factor, long_factor, threshold = float(params[2]), float(params[3]), float(params[4])
+        if end-start < 8:
+            return 0
 
-        return self.test_vidya_model(candle_object, start, end, short_factor, long_factor, threshold)
+        if end_calib - start < 4:
+            end_calib = min(end, start+4)
 
+        n = test_size
+        hh = candle_obj.weighted_avg_and_stdev(n - test_size, n)
+        avg = hh[0]
+        stdev = hh[1]
 
+        # the market is c1/c2           
+        total_c1 = 1.0
+        total_c2 = 0
+        side = 'c1'
+        buy_count = 0
+        sell_count = 0
 
-    def avg_and_stdev(self, candle_object, start, end):
+        for i in range(end_calib, end - 1):
+            close = float(c_list[i + 1]['close_price'])
 
-        c_list = candle_object.candle_list
+            if (close < (avg + stdev * buy_th) and side == 'c1'):
+                total_c2 = (1 - fee) * total_c1 / close
+                total_c1 = 0
+                buy_count += 1
+                side = 'c2'
 
-        tot = 0
-        n = 0
-        for i in range(start, end):
-            close = float(c_list[i]['close_price'])
-            tot += close
-            n += 1
+            if (close > (avg + stdev * sell_th) and side == 'c2'):
+                total_c1 = (1 - fee) * total_c2 * close
+                total_c2 = 0
+                sell_count += 1
+                side = 'c1'
 
-        avg = tot / n
-        tot = 0
-        for i in range(start, end):
-            close = float(c_list[i]['close_price'])
-            tot += (close - avg)**2
+            if (updating):
+                hh = candle_object.weighted_avg_and_stdev(n - test_size, n)
+                avg = hh[0]
+                stdev = hh[1]
+                n += 1
 
-        stdev = (tot / (n - 1))**0.5
+        if side == 'c2':
+            total_c1 = (1 - fee) * total_c2 * close
+            total_c2 = 0
 
-        return (avg, stdev)
-
-
-    def weighted_avg_and_stdev(self, candle_object, start, end):
-
-        c_list = candle_object.candle_list
-
-        tot = 0
-        tot_volume = 0
-        n = 0
-        for i in range(start, end):
-            close = float(c_list[i]['close_price'])
-            vol = float(c_list[i]['volume'])
-            tot += close * vol
-            tot_volume += vol
-            n += 1
-
-        avg = tot / tot_volume
-
-        tot = 0
-
-        for i in range(start, end):
-            close = float(c_list[i]['close_price'])
-            vol = float(c_list[i]['volume'])
-            tot += vol * (close - avg)**2
-
-        stdev = (tot / tot_volume)**0.5
-
-        return (avg, stdev)
-
-
-    def optimize_stats(self, candle_object, start, end):
-
-
-        lim = 1000
-        mmax = -2
-
-        calib_proportion = 0.1
-        updating = True
-
-        for i in range(lim):
-            buy_th = -6*random.random()
-            sell_th = 6*random.random()
-            profit, buy_count, sell_count = \
-                self.test_stat_model(candle_object, start, end, buy_th, sell_th, calib_proportion, updating)
-            if profit > mmax:
-                bestbuy = buy_th
-                bestsell = sell_th
-                mmax = profit
-
-        return (bestbuy, bestsell)
-
-
-    def optimize_then_stat(self, candle_object, start, end):
-
-        half = int( (start + end)/2 )
-
-        optimized = self.optimize_stats(candle_object, start, half)
-
-        return self.test_stat_model(candle_object, half, end, optimized[0], optimized[1], 0.1, True)
+        profits = total_c1 - 1.0
+        return profits

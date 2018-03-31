@@ -4,15 +4,20 @@ from utils import active_internet
 NUM_CANDLES = 1000
 
 class MarketCandles(object):
-    def __init__(self, ccxt_exchange, mkt_symbol, interval):
+    def __init__(self, ccxt_exchange, mkt_symbol, candles_magnitude):
         if mkt_symbol not in ccxt_exchange.markets:
             print ccxt_exchange.markets
             raise Exception("invalid market symbol")
         self.ccxt_exchange = ccxt_exchange
         self.mkt_symbol = mkt_symbol
-        self.interval = interval
+        self.candles_magnitude = candles_magnitude
         self.candle_list = []
         self.update_candles()
+   
+
+    def get_candle(self, index):
+        return self.candle_list[index]
+
 
     def update_candles(self):
         ## should start appending later on
@@ -48,13 +53,15 @@ class MarketCandles(object):
             return new_list
 
         filename = './candles_txt_data/' + 'exchange=' + self.ccxt_exchange.ccxt_obj.id + '_mkt=' \
-                   + self.mkt_symbol.replace("/", "-") + '_data=candles_interval=' + self.interval + '.txt'
+                   + self.mkt_symbol.replace("/", "-") + '_data=candles_magnitude=' \
+                   + self.candles_magnitude + '.txt'
         if not active_internet():
             self.candle_list = get_offline_candles(filename)
         else:
             try:
                 self.candle_list = format_candle_list(
-                                        self.ccxt_exchange.ccxt_obj.fetch_ohlcv(self.mkt_symbol, self.interval, limit=1000)
+                                        self.ccxt_exchange.ccxt_obj.fetch_ohlcv(self.mkt_symbol, \
+                                                self.candles_magnitude, limit=1000)
                                     )
                 store_candles_offline(filename)
             except:
@@ -92,12 +99,55 @@ class MarketCandles(object):
         return (tot / n)**0.5
 
 
+    def avg_and_stdev(self, start=None, end=None):
+        start = 0 if start == None else start
+        end = len(self.candle_list) if end == None else end
+
+        avg = self.get_avg(start, end)
+        stdev = self.get_stdv(start, end)
+        return (avg, stdev)
+
+
+    def weighted_avg_and_stdev(self, start=None, end=None):
+        start = 0 if start == None else start
+        end = len(self.candle_list) if end == None else end
+
+        c_list = candle_object.candle_list
+
+        tot = 0
+        tot_volume = 0
+        n = 0
+        for i in range(start, end):
+            close = float(c_list[i]['close_price'])
+            vol = float(c_list[i]['volume'])
+            tot += close * vol
+            tot_volume += vol
+            n += 1
+
+        avg = tot / tot_volume
+
+        tot = 0
+
+        for i in range(start, end):
+            close = float(c_list[i]['close_price'])
+            vol = float(c_list[i]['volume'])
+            tot += vol * (close - avg)**2
+
+        stdev = (tot / tot_volume)**0.5
+
+        return (avg, stdev)
+
+
+
     # assumes data is in ascending time
-    def get_ema_list(self, factor):
+    def get_ema_list(self, factor, start=None, end=None):
+        start = 0 if start == None else start
+        end = len(self.candle_list) if end == None else end
+
         ema_list = []
         current_ema = - 1
 
-        for candle in self.candle_list:
+        for candle in self.candle_list[start:end]:
             close = float(candle['close_price'])
             
             if current_ema == -1:
@@ -110,11 +160,14 @@ class MarketCandles(object):
         return ema_list
 
 
-    def get_vidya_list(self, factor):
+    def get_vidya_list(self, factor, start=None, end=None):
+        start = 0 if start == None else start
+        end = len(self.candle_list) if end == None else end
+
         vidya_list = []
         current_vidya = -1
 
-        for candle in self.candle_list:
+        for candle in self.candle_list[start:end]:
             close_price = float(candle['close_price'])
             open_price = float(candle['open_price'])
             cmo = (open_price - close_price) / (open_price + close_price)

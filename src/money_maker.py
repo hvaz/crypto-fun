@@ -27,7 +27,7 @@ class MoneyMaker(ExchangeTrader):
         # when the order is filled or canceled, it continues to the next cycle
         while True:
 
-            candles_obj = self.markets[mkt_symbol].candles
+            candles_obj = self.markets[self.mkt_symbol].candles
             avg = candles_obj.get_avg(start)
             stdev = candles_obj.get_std(start)
 
@@ -35,7 +35,7 @@ class MoneyMaker(ExchangeTrader):
 
                 buy_price = avg + stdev * buy_th
 
-                current_order = self.buy(mkt_symbol, quantity, buy_price)
+                current_order = self.buy(self.mkt_symbol, quantity, buy_price)
 
                 # some error handling should go here (insufficient funds, etc)
 
@@ -61,7 +61,7 @@ class MoneyMaker(ExchangeTrader):
                 
                 sell_price = avg + stdev * sell_th
 
-                current_order = self.sell(mkt_symbol, quantity, sell_price)
+                current_order = self.sell(self.mkt_symbol, quantity, sell_price)
 
                 # some error handling should go here
 

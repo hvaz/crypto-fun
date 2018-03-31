@@ -1,13 +1,15 @@
 import time
 from traders import ExchangeTrader
+from markets import Market
 
 def test_trader_pipeline():
 
     hitbtc2 = ExchangeTrader("hitbtc2")
+    eth-btc_market = Market("ETH/BTC", hitbtc2)
 
     try:
-        hitbtc2.buy("ETH/BTC", 0.001, 0.00059498)
-        hitbtc2.sell("ETH/BTC", 0.001, 0.1)
+        hitbtc2.buy(eth-btc_market, 0.001, 0.00059498)
+        hitbtc2.sell(eth-btc_market, 0.001, 0.1)
     except:
         raise
 

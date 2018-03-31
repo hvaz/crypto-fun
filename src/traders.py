@@ -18,7 +18,9 @@ class ExchangeTrader(ccxtExchange):
             self.orders_history = []
 
 
-    def _make_order(self, mkt_symbol, quantity, price=None, side='buy', order_type='limit'):
+    def _make_order(self, mkt_obj, quantity, price=None, side='buy', order_type='limit'):
+        mkt_symbol = mkt_obj.symbol
+
         if side not in ['buy', 'sell']:
             raise ValueError("make order: -side- parameter must be either 'buy' or 'sell'")
         if order_type not in ['limit', 'market']:
@@ -46,14 +48,18 @@ class ExchangeTrader(ccxtExchange):
             return order
 
 
-    def buy(self, mkt_symbol, quantity, price=None, limit=True):
+    def buy(self, mkt_obj, quantity, price=None, limit=True):
+        mkt_symbol = mkt_obj.symbol
+
         if limit:
             self._make_order(mkt_symbol, quantity, price, side='buy', order_type='limit')
         else:
             self._make_order(mkt_symbol, quantity, price, side='buy', order_type='market')
 
 
-    def sell(self, mkt_symbol, quantity, price, limit=True):
+    def sell(self, mkt_obj, quantity, price, limit=True):
+        mkt_symbol = mkt_obj.symbol
+
         if limit:
             self._make_order(mkt_symbol, quantity, price, side='sell', order_type='limit')
         else:

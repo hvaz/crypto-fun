@@ -1,7 +1,6 @@
-import random
 import ccxt
 from collections import defaultdict
-from ccxt_exchanges import ccxtExchange
+#from ccxt_exchanges import ccxtExchange
 from candles import MarketCandles
 from printing import print_comparing_hold
 
@@ -16,16 +15,16 @@ class Market(object):
         self.candles = defaultdict(lambda: None)
         
 
-    def get_candles(self, interval, start=None, end=None):
+    def get_candles(self, candles_magnitude, start=None, end=None):
         
         ## IF PROGRAM IS RUNNING FOREVER, THE LIST OF MARKET CANDLES DOES NOT UPDATE
         ## AS TIME GOES BY
 
-        if self.candles[interval] == None:
-            self.candles[interval] = MarketCandles(self.ccxt_exchange, self.symbol, interval)
+        if self.candles[candles_magnitude] == None:
+            self.candles[candles_magnitude] = MarketCandles(self.ccxt_exchange, self.symbol, \
+                                                            candles_magnitude)
         
-        #start = 0 if start == None else start
-        #end = len(self.candles[interval].candle_list) if end == None else end
+        start = 0 if start == None else start
+        end = len(self.candles[candles_magnitude].candle_list) if end == None else end
 
-        return self.candles[interval]
-    #.candle_list[start:end]
+        return self.candles[candles_magnitude].candle_list[start:end]
