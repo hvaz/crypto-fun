@@ -1,7 +1,7 @@
 keys = { \
     "hitbtc2": { \
-        "apiKey": "18d704f765ec49f2f132f08655611ce9", \
-        "secret": "85433250f2974cd7b1751ec76d359c57" \
+        "apiKey": "f778d085656be257b2c6ccb7adb9ec2a", \
+        "secret": "d97022682df232f1b22d874cc123c54c" \
     }, \
     "binance": { \
         "apiKey": "", \

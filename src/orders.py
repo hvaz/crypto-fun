@@ -15,8 +15,19 @@ class Order(object):
 
             Return Value: https://github.com/ccxt/ccxt/wiki/Manual#exceptions-on-order-canceling
         '''
+
+        canceled = False
+        
+        while not canceled:
+            try:
+                canceled = (self.status() == 'canceled')
+                print self.status()
+                self.owner.ccxt_obj.cancel_order(self.id)
+            except Exception as e:
+                print e
+            
+
         try:
-            self.owner.ccxt_obj.cancel_order(self.id)
             self.owner.kill_order(self)
         except Exception as e:
             print e
@@ -31,11 +42,17 @@ class Order(object):
 
             Return Value: dictionary as specified in https://github.com/ccxt/ccxt/wiki/Manual#order-structure
         '''
+        
+        order = None
+
         if self.owner.ccxt_obj.has['fetchOrder']:
-            order = self.owner.ccxt_obj.fetch_order(self.id)
-            return order
-        else:
-            return None
+            while order == None:
+                try:
+                    order = self.owner.ccxt_obj.fetch_order(self.id)
+                except Exception as e:
+                    print e
+  
+        return order
 
 
     def status(self):
@@ -47,12 +64,13 @@ class Order(object):
             Return Value: None, 'open', 'closed', or 'canceled'    
         '''
         status = None
+        
         try:
             status = self.full_info()['status']
         except Exception as e:
-            raise e
-        finally:
-            return status
+            print e
+
+        return status
 
 
     def is_filled(self):
