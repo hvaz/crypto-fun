@@ -10,10 +10,7 @@ def print_comparing_hold(info, profit, hold_profit):
         if profit == None:
             print colorama.Fore.MAGENTA + info
 
-        elif profit == 0:
-            print colorama.Fore.YELLOW + info
-
-        elif profit > hold_profit:
+        elif profit >= hold_profit:
             print colorama.Fore.GREEN + info
 
         elif profit == hold_profit:
