@@ -18,6 +18,8 @@ class MoneyMaker(ExchangeTrader):
         sell_th = 1.0
         start = 200
 
+        avg_interval = 60
+
         sleep_interval = 3 * 60
         time_to_reset = 10 * sleep_interval
 
@@ -28,8 +30,9 @@ class MoneyMaker(ExchangeTrader):
         while True:
 
             candles_obj = self.markets[self.mkt_symbol].candles
-            avg = candles_obj.get_avg(start)
-            stdev = candles_obj.get_std(start)
+            num_of_candles = len(candles_obj.candle_list)
+            avg = candles_obj.get_avg(num_of_candles - avg_interval, num_of_candles)
+            stdev = candles_obj.get_std(num_of_candles - avg_interval, num_of_candles)
 
             if side == 'c1':
 

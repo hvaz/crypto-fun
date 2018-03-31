@@ -102,7 +102,7 @@ class MarketCandles(object):
     def avg_and_stdev(self, start=None, end=None):
 
         avg = self.get_avg(start, end)
-        stdev = self.get_stdv(start, end)
+        stdev = self.get_std(start, end)
         return (avg, stdev)
 
 

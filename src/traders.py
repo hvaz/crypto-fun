@@ -49,21 +49,19 @@ class ExchangeTrader(ccxtExchange):
 
 
     def buy(self, mkt_obj, quantity, price=None, limit=True):
-        mkt_symbol = mkt_obj.symbol
 
         if limit:
-            self._make_order(mkt_symbol, quantity, price, side='buy', order_type='limit')
+            self._make_order(mkt_obj, quantity, price, side='buy', order_type='limit')
         else:
-            self._make_order(mkt_symbol, quantity, price, side='buy', order_type='market')
+            self._make_order(mkt_obj, quantity, price, side='buy', order_type='market')
 
 
     def sell(self, mkt_obj, quantity, price, limit=True):
-        mkt_symbol = mkt_obj.symbol
 
         if limit:
-            self._make_order(mkt_symbol, quantity, price, side='sell', order_type='limit')
+            self._make_order(mkt_obj, quantity, price, side='sell', order_type='limit')
         else:
-            self._make_order(mkt_symbol, quantity, price, side='sell', order_type='market')
+            self._make_order(mkt_obj, quantity, price, side='sell', order_type='market')
 
 
     def kill_order(self, order):
