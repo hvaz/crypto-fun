@@ -2,6 +2,7 @@ import time
 from traders import ExchangeTrader
 from markets import Market
 
+
 def test_trader_pipeline():
 
     hitbtc2 = ExchangeTrader("hitbtc2")

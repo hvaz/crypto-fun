@@ -1,4 +1,4 @@
-from ccxt_exchanges import ExchangeTrader
+from traders import ExchangeTrader
 import time
 
 class MoneyMaker(ExchangeTrader):
@@ -29,7 +29,7 @@ class MoneyMaker(ExchangeTrader):
         # when the order is filled or canceled, it continues to the next cycle
         while True:
 
-            candles_obj = self.markets[self.mkt_symbol].candles
+            candles_obj = self.markets[self.mkt_symbol].get_candles()
             num_of_candles = len(candles_obj.candle_list)
             avg = candles_obj.get_avg(num_of_candles - avg_interval, num_of_candles)
             stdev = candles_obj.get_std(num_of_candles - avg_interval, num_of_candles)
@@ -85,3 +85,5 @@ class MoneyMaker(ExchangeTrader):
 
                 side = 'c1'
                 continue
+
+
