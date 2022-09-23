@@ -71,7 +71,7 @@ ply==3.8
 prompt-toolkit==1.0.15
 proto-google-cloud-datastore-v1==0.90.4
 proto-google-cloud-pubsub-v1==0.15.4
-protobuf==3.3.0
+protobuf==3.18.3
 ptyprocess==0.5.2
 py==1.5.2
 PyAMF==0.6.1
