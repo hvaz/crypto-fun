@@ -10,7 +10,7 @@ backports.shutil-get-terminal-size==1.0.0
 beautifulsoup4==4.6.0
 cachetools==2.0.1
 ccxt==1.10.1230
-certifi==2018.1.18
+certifi==2022.12.7
 chardet==3.0.4
 chromedriver==2.24.1
 configparser==3.5.0
